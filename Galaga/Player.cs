@@ -1,3 +1,4 @@
+using System.Dynamic;
 using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 
@@ -14,5 +15,17 @@ public class Player {
 
     public void Render() {
         // TODO: render spiller
+    }
+
+    public void Move() {
+
+    }
+
+    public void SetMoveLeft(bool val) {
+
+    }
+
+    public void SetMoveRight(bool val) {
+
     }
 }
