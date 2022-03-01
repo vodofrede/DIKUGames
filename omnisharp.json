@@ -1,0 +1,43 @@
+{
+  "FormattingOptions": {
+    "NewLine": "\n",
+    "UseTabs": false,
+    "TabSize": 4,
+    "IndentationSize": 4,
+    "IndentBraces": false,
+    "IndentBlock": true,
+    "IndentSwitchSection": true,
+    "IndentSwitchCaseSection": true,
+    "IndentSwitchCaseSectionWhenBlock": false,
+    "LabelPositioning": "oneLess",
+    "WrappingPreserveSingleLine": true,
+    "WrappingKeepStatementsOnSingleLine": true,
+    "NewLinesForBracesInTypes": false,
+    "NewLinesForBracesInMethods": false,
+    "NewLinesForBracesInProperties": false,
+    "NewLinesForBracesInAccessors": false,
+    "NewLinesForBracesInAnonymousMethods": false,
+    "NewLinesForBracesInControlBlocks": true,
+    "NewLinesForBracesInAnonymousTypes": true,
+    "NewLinesForBracesInObjectCollectionArrayInitializers": false,
+    "NewLinesForBracesInLambdaExpressionBody": false,
+    "NewLineForElse": true,
+    "NewLineForCatch": true,
+    "NewLineForFinally": true,
+    "NewLineForMembersInObjectInit": false,
+    "NewLineForMembersInAnonymousTypes": false,
+    "NewLineForClausesInQuery": true,
+    "OrganizeImports": true,
+    "enableEditorConfigSupport": true
+  },
+  "RoslynExtensionsOptions": {
+    "enableAnalyzersSupport": true,
+    "enableImportCompletion": true,
+    "enableDecompilationSupport": true
+  },
+  "RenameOptions": {
+    "RenameInComments": true,
+    "RenameOverloads": true,
+    "RenameInStrings": true
+  }
+}
