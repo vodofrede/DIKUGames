@@ -20,7 +20,11 @@ namespace Galaga {
         private IBaseImage playerShotImage;
         private AnimationContainer enemyExplosions;
         private List<Image> explosionStrides;
+        private int score = 0;
+        private Text scoreText;
+        private Text endGameText;
         private const int EXPLOSION_LENGTH_MS = 500;
+        private bool gameOver = false;
 
         public Game(WindowArgs windowArgs) : base(windowArgs) {
             // event bus (only subscribed to InputEvent)
@@ -37,7 +41,7 @@ namespace Galaga {
             enemies = new EntityContainer<Enemy>(numEnemies);
             for (int i = 0; i < numEnemies; i++) {
                 enemies.AddEntity(new Enemy(
-                    new DynamicShape(0.1f + (float)i * 0.1f, 0.8f, 0.1f, 0.1f),
+                    new DynamicShape(0.1f + (float)i * 0.1f, 0.9f, 0.1f, 0.1f),
                     new ImageStride(80, images)));
             }
             
@@ -54,6 +58,16 @@ namespace Galaga {
             // explosion setup
             enemyExplosions = new AnimationContainer(numEnemies);
             explosionStrides = ImageStride.CreateStrides(8, Path.Combine("Assets", "Images", "Explosion.png"));
+
+            // score
+            scoreText = new Text(string.Format("Score: " + score.ToString()), new Vec2F(0.5f, 0.5f), new Vec2F(0.2f, 0.2f));
+            scoreText.SetColor(new Vec3I(0, 128, 255));
+            scoreText.SetFontSize(200);
+
+            // endGameText
+            endGameText = new Text(string.Format("You won!"), new Vec2F(0.5f, 0.5f), new Vec2F(0.5f, 0.5f));
+            endGameText.SetFontSize(1000);
+            endGameText.SetColor(new Vec3I(0, 128, 255));
         }
 
         public void KeyPress(KeyboardKey key) {
@@ -110,14 +124,17 @@ namespace Galaga {
             window.Clear();
             player.Render();
             enemies.RenderEntities();
+            enemyExplosions.RenderAnimations();
             playerShots.RenderEntities();
+            if (gameOver) endGameText.RenderText();
+            if (!gameOver) scoreText.RenderText();
         }
 
         public override void Update() {
             window.PollEvents();
             eventBus.ProcessEventsSequentially();
             player.Move();
-            IterateShots();   
+            IterateShots();
         }
 
         private void IterateShots() {
@@ -129,21 +146,30 @@ namespace Galaga {
                     // if shot is out of bounds, delete shot
                     shot.DeleteEntity();
                     shot = null;
-                } else {
+                    
+                } 
+                else if (enemies.CountEntities() == 0) {
+                    gameOver = true;
+                }
+                else {
                     enemies.Iterate(enemy => {
-                        CollisionData possibleCollision = CollisionDetection.Aabb(shot.Shape.AsDynamicShape(), enemy.Shape);
-
-                        if (possibleCollision.Collision) {
-                            System.Console.WriteLine("collisions triggered");
-                            
-                            // if collision, then delete both shot and enemy
+                        // we couldn't get CollisionDetection.Aabb() to work, so we rewrote it
+                        if (Collision.Between(shot, enemy)) {
+                            AddExplosion(enemy.Shape.Position, enemy.Shape.Extent);
                             enemy.DeleteEntity(); shot.DeleteEntity();
+                            score += 1;
+                            scoreText.SetText(string.Format("Score: " + score.ToString()));
                         }
                     });
                 }
             });
         }
 
-        public void AddExplosion(Vec2F position, Vec2F extent) {}
+        public void AddExplosion(Vec2F position, Vec2F extent) {
+            StationaryShape shape = new(position.X, position.Y, extent.X, extent.Y);
+            ImageStride stride = new(EXPLOSION_LENGTH_MS / 8, explosionStrides);
+
+            enemyExplosions.AddAnimation(shape, EXPLOSION_LENGTH_MS, stride);
+        }
     }
 }
