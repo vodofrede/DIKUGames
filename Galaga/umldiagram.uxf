@@ -1,7 +1,7 @@
-<diagram program="umletino" version="14.4.0-SNAPSHOT"><zoom_level>10</zoom_level><help_text>Space for diagram notesP</help_text><element><id>UMLClass</id><coordinates><x>640</x><y>450</y><w>190</w><h>100</h></coordinates><panel_attributes>&lt;&lt;Interface&gt;&gt;
+<diagram program="umletino" version="14.4.0-SNAPSHOT"><zoom_level>10</zoom_level><help_text>Space for diagram notesP</help_text><element><id>UMLClass</id><coordinates><x>710</x><y>500</y><w>190</w><h>100</h></coordinates><panel_attributes>&lt;&lt;Interface&gt;&gt;
 IGameEventProcessor
 --
-void ProcessEvents</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>260</x><y>220</y><w>570</w><h>140</h></coordinates><panel_attributes>GameEventBus
+void ProcessEvents</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>330</x><y>270</y><w>570</w><h>140</h></coordinates><panel_attributes>GameEventBus
 --
 private Dictionary&lt;GameEventType, ICollection&lt;IGameEventProcessor&gt;&gt; _eventProcessors;
 private Dictionary&lt;GameEventType, GameEventQueue&lt;GameEvent&gt;&gt; _eventQueues;
@@ -9,11 +9,11 @@ private Dictionary&lt;GameEventType, GameEventQueue&lt;GameEvent&gt;&gt; _eventQ
 public void InitializeEventBus(ICollection&lt;GameEventType&gt; eventTypeList)
 public void Subscribe(GameEventType eventType, IGameEventProcessor gameEventProcessor)
 public void ProcessEventsSequentially(IEnumerable&lt;GameEventType&gt; processOrder)
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>260</x><y>450</y><w>290</w><h>100</h></coordinates><panel_attributes>Game
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>330</x><y>500</y><w>290</w><h>100</h></coordinates><panel_attributes>Game
 --
 private GameEventBus eventBus;
 --
-public void ProcessEvent(GameEvent gameEvent)</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>540</x><y>500</y><w>120</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>100;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>380</x><y>350</y><w>80</w><h>120</h></coordinates><panel_attributes>lt=&lt;-
+public void ProcessEvent(GameEvent gameEvent)</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>610</x><y>550</y><w>120</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>100;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>450</x><y>400</y><w>80</w><h>120</h></coordinates><panel_attributes>lt=&lt;-
 m1=1
-r1=eventBus</panel_attributes><additional_attributes>10;10;10;100</additional_attributes></element><element><id>Relation</id><coordinates><x>720</x><y>350</y><w>30</w><h>120</h></coordinates><panel_attributes>lt=-
+r1=eventBus</panel_attributes><additional_attributes>10;10;10;100</additional_attributes></element><element><id>Relation</id><coordinates><x>790</x><y>400</y><w>30</w><h>120</h></coordinates><panel_attributes>lt=-
 </panel_attributes><additional_attributes>10;10;10;100</additional_attributes></element></diagram>

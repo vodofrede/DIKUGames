@@ -139,7 +139,12 @@ namespace Galaga {
 
         private void IterateShots() {
             playerShots.Iterate(shot => {
-                shot.UpdatePosition();
+                                
+                DynamicShape dynamicShot = shot.Shape.AsDynamicShape();
+                dynamicShot.Direction.X = 0.0f;
+                dynamicShot.Direction.Y = 0.02f;
+
+                dynamicShot.Move();
             
                 Vec2F pos = shot.Shape.Position;
                 if (!(0.0f <= pos.X && pos.X <= 1.0f && 0.0f <= pos.Y && pos.Y <= 1.0f)) {
@@ -153,12 +158,14 @@ namespace Galaga {
                 }
                 else {
                     enemies.Iterate(enemy => {
-                        // we couldn't get CollisionDetection.Aabb() to work, so we rewrote it
-                        if (Collision.Between(shot, enemy)) {
+                        
+                        bool collision = CollisionDetection.Aabb(dynamicShot, enemy.Shape).Collision;
+
+                        if (collision) {
                             AddExplosion(enemy.Shape.Position, enemy.Shape.Extent);
                             enemy.DeleteEntity(); shot.DeleteEntity();
                             score += 1;
-                            scoreText.SetText(string.Format("Score: " + score.ToString()));
+                            scoreText.SetText(string.Format("Score: " + score.ToString()));   
                         }
                     });
                 }
