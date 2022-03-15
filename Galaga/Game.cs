@@ -10,53 +10,63 @@ using DIKUArcade.GUI;
 using DIKUArcade.Input;
 using DIKUArcade.Math;
 using DIKUArcade.Physics;
+using Galaga.Squadron;
 
 namespace Galaga {
     public class Game : DIKUGame, IGameEventProcessor {
         private GameEventBus eventBus;
+
+        // game state
+        private int score = 0;
+        private bool gameOver = false;
+
+        // contained entities
         private Player player;
-        private EntityContainer<Enemy> enemies;
+        private ISquadron squadron;
+        // private EntityContainer<Enemy> enemies;
         private EntityContainer<PlayerShot> playerShots;
+
+        // images & animations
         private IBaseImage playerShotImage;
         private AnimationContainer enemyExplosions;
         private List<Image> explosionStrides;
-        private int score = 0;
+        private List<Image> enemyStridesGreen;
+        private List<Image> enemyStridesBlue;
+        private const int EXPLOSION_LENGTH_MS = 500;
+
+        // text
         private Text scoreText;
         private Text endGameText;
-        private const int EXPLOSION_LENGTH_MS = 500;
-        private bool gameOver = false;
 
         public Game(WindowArgs windowArgs) : base(windowArgs) {
             // event bus (only subscribed to InputEvent)
             eventBus = new GameEventBus();
-            eventBus.InitializeEventBus(new List<GameEventType> { GameEventType.InputEvent });
+            eventBus.InitializeEventBus(new List<GameEventType> { GameEventType.InputEvent, GameEventType.PlayerEvent });
 
+            // key input forwarding
             window.SetKeyEventHandler(KeyHandler);
-            eventBus.Subscribe(GameEventType.InputEvent, this);
 
-            // enemy setup
-            var images = ImageStride.CreateStrides(4, Path.Combine("Assets", "Images", "BlueMonster.png"));
-            const int numEnemies = 8;
+            // squadron setup
+            enemyStridesBlue = ImageStride.CreateStrides(4, Path.Combine("Assets", "Images", "BlueMonster.png"));
+            enemyStridesGreen = ImageStride.CreateStrides(2, Path.Combine("Assets", "Images", "GreenMonster.png"));
 
-            enemies = new EntityContainer<Enemy>(numEnemies);
-            for (int i = 0; i < numEnemies; i++) {
-                enemies.AddEntity(new Enemy(
-                    new DynamicShape(0.1f + (float)i * 0.1f, 0.9f, 0.1f, 0.1f),
-                    new ImageStride(80, images)));
-            }
+            squadron = new RoundSquadron();
+            squadron.CreateEnemies(enemyStridesBlue, enemyStridesGreen);
             
             // player setup
             player = new Player(
                 new DynamicShape(new Vec2F(0.45f, 0.1f), new Vec2F(0.1f, 0.1f)),
-                new Image(Path.Combine("Assets", "Images", "Player.png"))
+                new
+                Image(Path.Combine("Assets", "Images", "Player.png"))
             );
+            eventBus.Subscribe(GameEventType.PlayerEvent, player);
 
             // player shot setup
             playerShots = new EntityContainer<PlayerShot>();
             playerShotImage = new Image(Path.Combine("Assets", "Images", "BulletRed2.png"));
 
             // explosion setup
-            enemyExplosions = new AnimationContainer(numEnemies);
+            enemyExplosions = new AnimationContainer(squadron.MaxEnemies);
             explosionStrides = ImageStride.CreateStrides(8, Path.Combine("Assets", "Images", "Explosion.png"));
 
             // score
@@ -67,23 +77,30 @@ namespace Galaga {
             // endGameText
             endGameText = new Text(string.Format("You won!"), new Vec2F(0.5f, 0.5f), new Vec2F(0.5f, 0.5f));
             endGameText.SetFontSize(1000);
-            endGameText.SetColor(new Vec3I(0, 128, 255));
+            endGameText.SetColor(new Vec3I(0, 128, 255));            
         }
 
         public void KeyPress(KeyboardKey key) {
             switch (key) {
                 case KeyboardKey.Right:
-                    player.SetMoveLeft(false);
-                    player.SetMoveRight(true);
-                break;
-                 
+                    eventBus.RegisterEvent (new GameEvent {
+                        EventType = GameEventType.PlayerEvent,
+                        From = this,
+                        To = player,
+                        Message = "START_MOVE_RIGHT"
+                    });
+                    break;
                 case KeyboardKey.Left:
-                    player.SetMoveRight(false);
-                    player.SetMoveLeft(true);                    
-                break;
+                    eventBus.RegisterEvent (new GameEvent {
+                        EventType = GameEventType.PlayerEvent,
+                        From = this,
+                        To = player,
+                        Message = "START_MOVE_LEFT"
+                    });
+                    break;
             }
-            
         }
+
         public void KeyRelease(KeyboardKey key) {
             switch (key) {
                 case KeyboardKey.Space:
@@ -91,17 +108,26 @@ namespace Galaga {
                 break;
 
                 case KeyboardKey.Right:
-                    player.SetMoveRight(false);
+                    eventBus.RegisterEvent (new GameEvent {
+                        EventType = GameEventType.PlayerEvent,
+                        From = this,
+                        To = player,
+                        Message = "STOP_MOVE_RIGHT"
+                    });
                 break;
-                 
+
                 case KeyboardKey.Left:
-                    player.SetMoveLeft(false);
+                    eventBus.RegisterEvent (new GameEvent {
+                        EventType = GameEventType.PlayerEvent,
+                        From = this,
+                        To = player,
+                        Message = "STOP_MOVE_LEFT"
+                    });
                 break;
 
                 case KeyboardKey.Escape:
                     window.CloseWindow();
                 break;
-                
             }
         }
 
@@ -109,7 +135,7 @@ namespace Galaga {
             System.Console.WriteLine(gameEvent.Message);
         }
 
-        private void KeyHandler(KeyboardAction action, KeyboardKey key) {
+        private void KeyHandler(KeyboardAction action, KeyboardKey key) {            
             switch (action) {
                 case KeyboardAction.KeyPress:
                     KeyPress(key);
@@ -123,7 +149,7 @@ namespace Galaga {
         public override void Render() {
             window.Clear();
             player.Render();
-            enemies.RenderEntities();
+            squadron.Enemies.RenderEntities();
             enemyExplosions.RenderAnimations();
             playerShots.RenderEntities();
             if (gameOver) endGameText.RenderText();
@@ -153,20 +179,29 @@ namespace Galaga {
                     shot = null;
                     
                 } 
-                else if (enemies.CountEntities() == 0) {
+                else if (squadron.Enemies.CountEntities() == 0) {
                     gameOver = true;
                 }
                 else {
-                    enemies.Iterate(enemy => {
-                        
+                    squadron.Enemies.Iterate(enemy => {
                         bool collision = CollisionDetection.Aabb(dynamicShot, enemy.Shape).Collision;
 
                         if (collision) {
-                            AddExplosion(enemy.Shape.Position, enemy.Shape.Extent);
-                            enemy.DeleteEntity(); shot.DeleteEntity();
-                            score += 1;
-                            scoreText.SetText(string.Format("Score: " + score.ToString()));   
+                            shot.DeleteEntity();                            
+                            enemy.DecreaseHitpoints();
+
+                            if (enemy.Hitpoints <= 5) {
+                                enemy.SetEnragedToTrue();
+                            }
+
+                            if (enemy.Hitpoints == 0) {
+                                enemy.DeleteEntity(); 
+                                AddExplosion(enemy.Shape.Position, enemy.Shape.Extent);
+                                score += 1;
+                                scoreText.SetText(string.Format("Score: " + score.ToString()));   
+                            }
                         }
+                        
                     });
                 }
             });
