@@ -18,8 +18,8 @@ public class RoundSquadron : ISquadron {
         get { return maxEnemies; }
     }
 
-    public void CreateEnemies(List<Image> enemyStride, List<Image> alternativeEnemyStride) {
-        Vec2F[] posArray = { 
+    public void CreateEnemies(List<Image> enemyStride, List<Image> alternativeEnemyStride, float speed) {
+        Vec2F[] posArray = {
             new Vec2F(0.5f, 0.9f), 
             new Vec2F(0.4f, 0.8f), 
             new Vec2F(0.5f, 0.8f), 
@@ -31,7 +31,8 @@ public class RoundSquadron : ISquadron {
             enemies.AddEntity(new Enemy(
                 new DynamicShape(pos.X, pos.Y, 0.1f, 0.1f),
                 new ImageStride(80, enemyStride),
-                new ImageStride(80, alternativeEnemyStride)
+                new ImageStride(80, alternativeEnemyStride),
+                speed
             ));
         }
 

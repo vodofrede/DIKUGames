@@ -1,3 +1,4 @@
+using System; 
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
@@ -10,6 +11,7 @@ using DIKUArcade.GUI;
 using DIKUArcade.Input;
 using DIKUArcade.Math;
 using DIKUArcade.Physics;
+using Galaga.MovementStrategy;
 using Galaga.Squadron;
 
 namespace Galaga {
@@ -17,13 +19,15 @@ namespace Galaga {
         private GameEventBus eventBus;
 
         // game state
-        private int score = 0;
+        private Score score;
         private bool gameOver = false;
+        private float speedIncrease = 0.0003f;
+        private int rounds = 0;
 
         // contained entities
         private Player player;
         private ISquadron squadron;
-        // private EntityContainer<Enemy> enemies;
+        private IMovementStrategy strategy;
         private EntityContainer<PlayerShot> playerShots;
 
         // images & animations
@@ -35,7 +39,6 @@ namespace Galaga {
         private const int EXPLOSION_LENGTH_MS = 500;
 
         // text
-        private Text scoreText;
         private Text endGameText;
 
         public Game(WindowArgs windowArgs) : base(windowArgs) {
@@ -51,8 +54,11 @@ namespace Galaga {
             enemyStridesGreen = ImageStride.CreateStrides(2, Path.Combine("Assets", "Images", "GreenMonster.png"));
 
             squadron = new RoundSquadron();
-            squadron.CreateEnemies(enemyStridesBlue, enemyStridesGreen);
+            squadron.CreateEnemies(enemyStridesBlue, enemyStridesGreen, 0.0006f);
             
+            // movement strategy setup 
+            strategy = new ZigZagDown();
+
             // player setup
             player = new Player(
                 new DynamicShape(new Vec2F(0.45f, 0.1f), new Vec2F(0.1f, 0.1f)),
@@ -70,14 +76,12 @@ namespace Galaga {
             explosionStrides = ImageStride.CreateStrides(8, Path.Combine("Assets", "Images", "Explosion.png"));
 
             // score
-            scoreText = new Text(string.Format("Score: " + score.ToString()), new Vec2F(0.5f, 0.5f), new Vec2F(0.2f, 0.2f));
-            scoreText.SetColor(new Vec3I(0, 128, 255));
-            scoreText.SetFontSize(200);
+            score = new Score(new Vec2F(0.5f, 0.5f), new Vec2F(0.2f, 0.2f));
 
             // endGameText
-            endGameText = new Text(string.Format("You won!"), new Vec2F(0.5f, 0.5f), new Vec2F(0.5f, 0.5f));
+            endGameText = new Text(string.Format("Game Over!"), new Vec2F(0.5f, 0.5f), new Vec2F(0.5f, 0.5f));
             endGameText.SetFontSize(1000);
-            endGameText.SetColor(new Vec3I(0, 128, 255));            
+            endGameText.SetColor(new Vec3I(0, 128, 255));
         }
 
         public void KeyPress(KeyboardKey key) {
@@ -146,14 +150,51 @@ namespace Galaga {
             }
         }
 
+        public void InitializeSquadronAndStrategy() {
+            Random rand = new Random();
+            int squadronNumber = rand.Next(3);
+            int strategyNumber = rand.Next(3);
+            
+            squadron = null;
+            switch (squadronNumber) {
+                case 0:
+                    squadron = new PyramidSquadron();
+                    break;
+                case 1:
+                    squadron = new RoundSquadron();
+                    break;
+                case 2: 
+                    squadron = new SquareSquadron();
+                    break;
+            }
+            
+            squadron.CreateEnemies(enemyStridesBlue, enemyStridesGreen, speedIncrease);
+
+            strategy = null;
+            switch (strategyNumber) {
+                case 0:
+                    strategy = new NoMove();
+                    break;
+                case 1:
+                    strategy = new ZigZagDown();
+                    break;
+                case 2: 
+                    strategy = new Down();
+                    break;
+            }
+        }
+
         public override void Render() {
             window.Clear();
-            player.Render();
-            squadron.Enemies.RenderEntities();
-            enemyExplosions.RenderAnimations();
-            playerShots.RenderEntities();
-            if (gameOver) endGameText.RenderText();
-            if (!gameOver) scoreText.RenderText();
+            score.RenderScore();
+            if (gameOver) {
+                endGameText.RenderText();
+            } else {
+                player.Render();
+                squadron.Enemies.RenderEntities();
+                enemyExplosions.RenderAnimations();
+                playerShots.RenderEntities();
+            }
         }
 
         public override void Update() {
@@ -161,11 +202,11 @@ namespace Galaga {
             eventBus.ProcessEventsSequentially();
             player.Move();
             IterateShots();
+            strategy.MoveEnemies(squadron.Enemies);
         }
 
         private void IterateShots() {
             playerShots.Iterate(shot => {
-                                
                 DynamicShape dynamicShot = shot.Shape.AsDynamicShape();
                 dynamicShot.Direction.X = 0.0f;
                 dynamicShot.Direction.Y = 0.02f;
@@ -180,7 +221,11 @@ namespace Galaga {
                     
                 } 
                 else if (squadron.Enemies.CountEntities() == 0) {
-                    gameOver = true;
+                    rounds++;
+                    speedIncrease += 0.0003f;
+                    
+                    InitializeSquadronAndStrategy();
+                    
                 }
                 else {
                     squadron.Enemies.Iterate(enemy => {
@@ -190,18 +235,20 @@ namespace Galaga {
                             shot.DeleteEntity();                            
                             enemy.DecreaseHitpoints();
 
-                            if (enemy.Hitpoints <= 5) {
+                            if (enemy.Hitpoints <= 3 && !enemy.Enraged) {
                                 enemy.SetEnragedToTrue();
                             }
 
                             if (enemy.Hitpoints == 0) {
                                 enemy.DeleteEntity(); 
                                 AddExplosion(enemy.Shape.Position, enemy.Shape.Extent);
-                                score += 1;
-                                scoreText.SetText(string.Format("Score: " + score.ToString()));   
+                                score.AddPoints();
                             }
                         }
-                        
+
+                        if (enemy.Shape.Position.Y <= 0.0f) {
+                            gameOver = true;
+                        }
                     });
                 }
             });
