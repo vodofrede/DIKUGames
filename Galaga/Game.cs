@@ -245,7 +245,6 @@ namespace Galaga {
                                 score.AddPoints();
                             }
                         }
-
                         if (enemy.Shape.Position.Y <= 0.0f) {
                             gameOver = true;
                         }
