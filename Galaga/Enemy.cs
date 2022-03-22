@@ -9,8 +9,8 @@ namespace Galaga {
         private float speed;
         private Vec2F startingPosition;
 
-        public Vec2F StartingPosition { get { return startingPosition; }}
-        public float Speed { get { return speed; } set { speed = value; }}
+        public Vec2F StartingPosition { get { return startingPosition; } }
+        public float Speed { get { return speed; } set { speed = value; } }
 
         private IBaseImage altImage;
 
@@ -24,10 +24,10 @@ namespace Galaga {
 
         public Enemy(DynamicShape shape, IBaseImage image, IBaseImage altImage, float speed)
             : base(shape, image) {
-                this.altImage = altImage;
-                this.startingPosition = shape.Position;
-                this.speed = speed;
-            }
+            this.altImage = altImage;
+            this.startingPosition = shape.Position;
+            this.speed = speed;
+        }
 
         public void SetEnragedToTrue() {
             enraged = true;
