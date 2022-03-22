@@ -1,4 +1,4 @@
-using System; 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
@@ -16,7 +16,7 @@ using Galaga.Squadron;
 
 namespace Galaga {
     public class Game : DIKUGame, IGameEventProcessor {
-        private GameEventBus eventBus;
+
 
         // game state
         private Score score;
@@ -42,8 +42,8 @@ namespace Galaga {
         private Text endGameText;
 
         public Game(WindowArgs windowArgs) : base(windowArgs) {
-            // event bus (only subscribed to InputEvent)
-            eventBus = new GameEventBus();
+            // event bus
+            var eventBus = GalagaBus.GetBus();
             eventBus.InitializeEventBus(new List<GameEventType> { GameEventType.InputEvent, GameEventType.PlayerEvent });
 
             // key input forwarding
@@ -55,7 +55,7 @@ namespace Galaga {
 
             squadron = new RoundSquadron();
             squadron.CreateEnemies(enemyStridesBlue, enemyStridesGreen, 0.0006f);
-            
+
             // movement strategy setup 
             strategy = new ZigZagDown();
 
@@ -85,9 +85,10 @@ namespace Galaga {
         }
 
         public void KeyPress(KeyboardKey key) {
-            switch (key) {
+            switch (key)
+            {
                 case KeyboardKey.Right:
-                    eventBus.RegisterEvent (new GameEvent {
+                    GalagaBus.GetBus().RegisterEvent(new GameEvent {
                         EventType = GameEventType.PlayerEvent,
                         From = this,
                         To = player,
@@ -95,7 +96,7 @@ namespace Galaga {
                     });
                     break;
                 case KeyboardKey.Left:
-                    eventBus.RegisterEvent (new GameEvent {
+                    GalagaBus.GetBus().RegisterEvent(new GameEvent {
                         EventType = GameEventType.PlayerEvent,
                         From = this,
                         To = player,
@@ -106,32 +107,33 @@ namespace Galaga {
         }
 
         public void KeyRelease(KeyboardKey key) {
-            switch (key) {
+            switch (key)
+            {
                 case KeyboardKey.Space:
                     playerShots.AddEntity(new PlayerShot(player.GetPosition(), playerShotImage));
-                break;
+                    break;
 
                 case KeyboardKey.Right:
-                    eventBus.RegisterEvent (new GameEvent {
+                    GalagaBus.GetBus().RegisterEvent(new GameEvent {
                         EventType = GameEventType.PlayerEvent,
                         From = this,
                         To = player,
                         Message = "STOP_MOVE_RIGHT"
                     });
-                break;
+                    break;
 
                 case KeyboardKey.Left:
-                    eventBus.RegisterEvent (new GameEvent {
+                    GalagaBus.GetBus().RegisterEvent(new GameEvent {
                         EventType = GameEventType.PlayerEvent,
                         From = this,
                         To = player,
                         Message = "STOP_MOVE_LEFT"
                     });
-                break;
+                    break;
 
                 case KeyboardKey.Escape:
                     window.CloseWindow();
-                break;
+                    break;
             }
         }
 
@@ -139,8 +141,9 @@ namespace Galaga {
             System.Console.WriteLine(gameEvent.Message);
         }
 
-        private void KeyHandler(KeyboardAction action, KeyboardKey key) {            
-            switch (action) {
+        private void KeyHandler(KeyboardAction action, KeyboardKey key) {
+            switch (action)
+            {
                 case KeyboardAction.KeyPress:
                     KeyPress(key);
                     break;
@@ -154,31 +157,33 @@ namespace Galaga {
             Random rand = new Random();
             int squadronNumber = rand.Next(3);
             int strategyNumber = rand.Next(3);
-            
+
             squadron = null;
-            switch (squadronNumber) {
+            switch (squadronNumber)
+            {
                 case 0:
                     squadron = new PyramidSquadron();
                     break;
                 case 1:
                     squadron = new RoundSquadron();
                     break;
-                case 2: 
+                case 2:
                     squadron = new SquareSquadron();
                     break;
             }
-            
+
             squadron.CreateEnemies(enemyStridesBlue, enemyStridesGreen, speedIncrease);
 
             strategy = null;
-            switch (strategyNumber) {
+            switch (strategyNumber)
+            {
                 case 0:
                     strategy = new NoMove();
                     break;
                 case 1:
                     strategy = new ZigZagDown();
                     break;
-                case 2: 
+                case 2:
                     strategy = new Down();
                     break;
             }
@@ -187,9 +192,12 @@ namespace Galaga {
         public override void Render() {
             window.Clear();
             score.RenderScore();
-            if (gameOver) {
+            if (gameOver)
+            {
                 endGameText.RenderText();
-            } else {
+            }
+            else
+            {
                 player.Render();
                 squadron.Enemies.RenderEntities();
                 enemyExplosions.RenderAnimations();
@@ -199,7 +207,7 @@ namespace Galaga {
 
         public override void Update() {
             window.PollEvents();
-            eventBus.ProcessEventsSequentially();
+            GalagaBus.GetBus().ProcessEventsSequentially();
             player.Move();
             IterateShots();
             strategy.MoveEnemies(squadron.Enemies);
@@ -212,40 +220,48 @@ namespace Galaga {
                 dynamicShot.Direction.Y = 0.02f;
 
                 dynamicShot.Move();
-            
+
                 Vec2F pos = shot.Shape.Position;
-                if (!(0.0f <= pos.X && pos.X <= 1.0f && 0.0f <= pos.Y && pos.Y <= 1.0f)) {
+                if (!(0.0f <= pos.X && pos.X <= 1.0f && 0.0f <= pos.Y && pos.Y <= 1.0f))
+                {
                     // if shot is out of bounds, delete shot
                     shot.DeleteEntity();
                     shot = null;
-                    
-                } 
-                else if (squadron.Enemies.CountEntities() == 0) {
+
+                }
+                else if (squadron.Enemies.CountEntities() == 0)
+                {
                     rounds++;
                     speedIncrease += 0.0003f;
-                    
+
                     InitializeSquadronAndStrategy();
-                    
+
                 }
-                else {
+                else
+                {
                     squadron.Enemies.Iterate(enemy => {
                         bool collision = CollisionDetection.Aabb(dynamicShot, enemy.Shape).Collision;
 
-                        if (collision) {
-                            shot.DeleteEntity();                            
+                        if (collision)
+                        {
+                            shot.DeleteEntity();
                             enemy.DecreaseHitpoints();
 
-                            if (enemy.Hitpoints <= 3 && !enemy.Enraged) {
+                            if (enemy.Hitpoints <= 3 && !enemy.Enraged)
+                            {
                                 enemy.SetEnragedToTrue();
                             }
 
-                            if (enemy.Hitpoints == 0) {
-                                enemy.DeleteEntity(); 
+                            if (enemy.Hitpoints == 0)
+                            {
+                                enemy.DeleteEntity();
                                 AddExplosion(enemy.Shape.Position, enemy.Shape.Extent);
                                 score.AddPoints();
                             }
                         }
-                        if (enemy.Shape.Position.Y <= 0.0f) {
+
+                        if (enemy.Shape.Position.Y <= 0.0f)
+                        {
                             gameOver = true;
                         }
                     });
