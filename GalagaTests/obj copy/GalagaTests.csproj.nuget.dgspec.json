@@ -1,0 +1,205 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/samuelhimmelstrup/DIKUGames/GalagaTests/GalagaTests.csproj": {}
+  },
+  "projects": {
+    "/Users/samuelhimmelstrup/DIKUGames/DIKUArcade/DIKUArcade/DIKUArcade.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/samuelhimmelstrup/DIKUGames/DIKUArcade/DIKUArcade/DIKUArcade.csproj",
+        "projectName": "DIKUArcade",
+        "projectPath": "/Users/samuelhimmelstrup/DIKUGames/DIKUArcade/DIKUArcade/DIKUArcade.csproj",
+        "packagesPath": "/Users/samuelhimmelstrup/.nuget/packages/",
+        "outputPath": "/Users/samuelhimmelstrup/DIKUGames/DIKUArcade/DIKUArcade/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/samuelhimmelstrup/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net5.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net5.0": {
+            "targetAlias": "net5.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net5.0": {
+          "targetAlias": "net5.0",
+          "dependencies": {
+            "OpenTK": {
+              "target": "Package",
+              "version": "[4.5.0, )"
+            },
+            "System.Drawing.Common": {
+              "target": "Package",
+              "version": "[5.0.1, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.101/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/samuelhimmelstrup/DIKUGames/Galaga/Galaga.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/samuelhimmelstrup/DIKUGames/Galaga/Galaga.csproj",
+        "projectName": "Galaga",
+        "projectPath": "/Users/samuelhimmelstrup/DIKUGames/Galaga/Galaga.csproj",
+        "packagesPath": "/Users/samuelhimmelstrup/.nuget/packages/",
+        "outputPath": "/Users/samuelhimmelstrup/DIKUGames/Galaga/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/samuelhimmelstrup/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "/Users/samuelhimmelstrup/DIKUGames/DIKUArcade/DIKUArcade/DIKUArcade.csproj": {
+                "projectPath": "/Users/samuelhimmelstrup/DIKUGames/DIKUArcade/DIKUArcade/DIKUArcade.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.101/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/samuelhimmelstrup/DIKUGames/GalagaTests/GalagaTests.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/samuelhimmelstrup/DIKUGames/GalagaTests/GalagaTests.csproj",
+        "projectName": "GalagaTests",
+        "projectPath": "/Users/samuelhimmelstrup/DIKUGames/GalagaTests/GalagaTests.csproj",
+        "packagesPath": "/Users/samuelhimmelstrup/.nuget/packages/",
+        "outputPath": "/Users/samuelhimmelstrup/DIKUGames/GalagaTests/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/samuelhimmelstrup/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "/Users/samuelhimmelstrup/DIKUGames/DIKUArcade/DIKUArcade/DIKUArcade.csproj": {
+                "projectPath": "/Users/samuelhimmelstrup/DIKUGames/DIKUArcade/DIKUArcade/DIKUArcade.csproj"
+              },
+              "/Users/samuelhimmelstrup/DIKUGames/Galaga/Galaga.csproj": {
+                "projectPath": "/Users/samuelhimmelstrup/DIKUGames/Galaga/Galaga.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[16.11.0, )"
+            },
+            "NUnit": {
+              "target": "Package",
+              "version": "[3.13.2, )"
+            },
+            "NUnit3TestAdapter": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[4.0.0, )"
+            },
+            "coverlet.collector": {
+              "target": "Package",
+              "version": "[3.1.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.101/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

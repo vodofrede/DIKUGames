@@ -10,6 +10,6 @@ public class TestEnemy {
 
     [Test]
     public void Test1() {
-        Assert.Pass();
+        Assert.AreEqual(1,1);
     }
-}
+}   

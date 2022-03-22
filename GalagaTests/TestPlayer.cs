@@ -1,9 +1,11 @@
-using DIKUArcade;
+using System.IO;
+using DIKUArcade.Entities;
+using DIKUArcade.Events;
+using DIKUArcade.Graphics;
+using DIKUArcade.GUI;
+using DIKUArcade.Math;
 using Galaga;
 using NUnit.Framework;
-
-
-namespace GalagaTests;
 
 // you should test that your player is moving as expected and that the obligations imposed by the ISquadron and
 // IMovementStrategy interfaces are being adequately met by the classes implementing them. Furthermore any relevant methods and their effect on
@@ -15,65 +17,72 @@ namespace GalagaTests;
 // well create an OpenGLContext in the [SetUp]. An example of this is shown
 // in Figure 4 in the context of testing the StateMachine.
 
-[TestFixture]
-public class TestPlayer {
-    [SetUp]
-    public void Setup() {
-        DIKUArcade.Window.CreateOpenGLContext();
+namespace GalagaTests {
 
-        Player player = new Player(
-            new DynamicShape(new Vec2F(0.4f, 0.1f), new Vec2F(0.1f, 0.1f)),
-            new Image(Path.Combine("Assets", "Images", "Player.png"))
-        );
+    [TestFixture]
+    public class TestPlayer {
 
-        GalagaBus galagaBus = GalagaBus.GetBus();
-        galagaBus.Subscribe(GameEventType.PlayerEvent, player);
+        Player? player;
+        GameEventBus galagaBus = GalagaBus.GetBus();
+    
+        [SetUp]
+        public void Setup() {
+            Window.CreateOpenGLContext();
 
-    }
+            player = new Player(
+                new DynamicShape(new Vec2F(0.4f, 0.1f), new Vec2F(0.1f, 0.1f)),
+                new Image(Path.Combine("Assets", "Images", "Player.png"))
+            );
 
-    [Test]
-    public void TestPlayerMovementRight() {
-
-        for (var i = 0; i < 10; i++)
-        {
-            galagaBus.RegisterEvent(new GameEvent {
-                EventType = GameEventType.PlayerEvent,
-                From = this,
-                To = player,
-                Message = "START_MOVE_RIGHT"
-            });
-
-            galagaBus.RegisterEvent(new GameEvent {
-                EventType = GameEventType.PlayerEvent,
-                From = this,
-                To = player,
-                Message = "STOP_MOVE_RIGHT"
-            });
+            galagaBus.Subscribe(GameEventType.PlayerEvent, player);
         }
 
-        Assert.Pass(player.shape.GetPosition() == new Vec2F(0.5f, 0.1f));
-    }
+        [Test]
+        public void TestPlayerMovementRight() {
 
-    [Test]
-    public void TestPlayerMovementLeft() {
+            for (var i = 0; i < 10; i++)
+            {
+                galagaBus.RegisterEvent(new GameEvent {
+                    EventType = GameEventType.PlayerEvent,
+                    From = this,
+                    To = player,
+                    Message = "START_MOVE_RIGHT"
+                });
 
-        for (var i = 0; i < 10; i++)
-        {
-            galagaBus.RegisterEvent(new GameEvent {
-                EventType = GameEventType.PlayerEvent,
-                From = this,
-                To = player,
-                Message = "START_MOVE_LEFT"
-            });
+                galagaBus.RegisterEvent(new GameEvent {
+                    EventType = GameEventType.PlayerEvent,
+                    From = this,
+                    To = player,
+                    Message = "STOP_MOVE_RIGHT"
+                });
+            }
 
-            galagaBus.RegisterEvent(new GameEvent {
-                EventType = GameEventType.PlayerEvent,
-                From = this,
-                To = player,
-                Message = "STOP_MOVE_LEFT"
-            });
+            Assert.AreEqual(player.GetPosition(), new Vec2F(0.5f, 0.1f));
         }
 
-        Assert.Pass(player.shape.GetPosition() == new Vec2F(0.3f, 0.1f));
+        [Test]
+        public void TestPlayerMovementLeft() {
+
+            for (var i = 0; i < 10; i++)
+            {
+                galagaBus.RegisterEvent(new GameEvent {
+                    EventType = GameEventType.PlayerEvent,
+                    From = this,
+                    To = player,
+                    Message = "START_MOVE_LEFT"
+                });
+
+                galagaBus.RegisterEvent(new GameEvent {
+                    EventType = GameEventType.PlayerEvent,
+                    From = this,
+                    To = player,
+                    Message = "STOP_MOVE_LEFT"
+                });
+            }
+
+            Assert.AreEqual(player.GetPosition(), new Vec2F(0.3f, 0.1f));
+        }
     }
 }
+
+

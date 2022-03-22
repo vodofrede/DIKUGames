@@ -17,7 +17,6 @@ using Galaga.Squadron;
 namespace Galaga {
     public class Game : DIKUGame, IGameEventProcessor {
 
-
         // game state
         private Score score;
         private bool gameOver = false;
