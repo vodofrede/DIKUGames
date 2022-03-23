@@ -2,15 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using DIKUArcade.Entities;
+using DIKUArcade.Events;
 using DIKUArcade.Graphics;
 using DIKUArcade.Input;
 using DIKUArcade.Math;
+using DIKUArcade.Physics;
 using DIKUArcade.State;
+using Galaga;
 using Galaga.MovementStrategy;
 using Galaga.Squadron;
-using DIKUArcade.Physics;
-using Galaga;
-using DIKUArcade.Events;
 
 namespace Galaga.GalagaStates {
     public class GameRunning : IGameState {
@@ -18,7 +18,6 @@ namespace Galaga.GalagaStates {
         private Score score;
         private bool gameOver = false;
         private float speedIncrease = 0.0003f;
-        private int rounds = 0;
 
         // contained entities
         private Player player;
@@ -38,9 +37,9 @@ namespace Galaga.GalagaStates {
         private Text endGameText;
 
         GameEventBus eventBus = GalagaBus.GetBus();
-        
+
         private static GameRunning instance = null;
-    
+
         public GameRunning() {
             // squadron setup
             enemyStridesBlue = ImageStride.CreateStrides(4, Path.Combine("Assets", "Images", "BlueMonster.png"));
@@ -78,21 +77,20 @@ namespace Galaga.GalagaStates {
         }
 
         public static IGameState GetInstance() {
-            return instance ?? (instance = new GameRunning());
+            return instance ??= new GameRunning();
         }
 
         public void RenderState() {
-            
+
             score.RenderScore();
             if (gameOver) {
                 endGameText.RenderText();
-            }
-            else {
+            } else {
                 player.Render();
                 squadron.Enemies.RenderEntities();
                 enemyExplosions.RenderAnimations();
                 playerShots.RenderEntities();
-            }            
+            }
         }
 
         public void ResetState() {
@@ -102,8 +100,8 @@ namespace Galaga.GalagaStates {
         public void UpdateState() {
             player.Move();
             IterateShots();
-            strategy.MoveEnemies(squadron.Enemies);             
-            
+            strategy.MoveEnemies(squadron.Enemies);
+
         }
 
         private void IterateShots() {
@@ -115,46 +113,36 @@ namespace Galaga.GalagaStates {
                 dynamicShot.Move();
 
                 Vec2F pos = shot.Shape.Position;
-                if (!(0.0f <= pos.X && pos.X <= 1.0f && 0.0f <= pos.Y && pos.Y <= 1.0f))
-                {
+                if (!(0.0f <= pos.X && pos.X <= 1.0f && 0.0f <= pos.Y && pos.Y <= 1.0f)) {
                     // if shot is out of bounds, delete shot
                     shot.DeleteEntity();
                     shot = null;
 
-                }
-                else if (squadron.Enemies.CountEntities() == 0)
-                {
-                    rounds++;
+                } else if (squadron.Enemies.CountEntities() == 0) {
                     speedIncrease += 0.0003f;
 
                     InitializeSquadronAndStrategy();
 
-                }
-                else
-                {
+                } else {
                     squadron.Enemies.Iterate(enemy => {
                         bool collision = CollisionDetection.Aabb(dynamicShot, enemy.Shape).Collision;
 
-                        if (collision)
-                        {
+                        if (collision) {
                             shot.DeleteEntity();
                             enemy.DecreaseHitpoints();
 
-                            if (enemy.Hitpoints <= 3 && !enemy.Enraged)
-                            {
+                            if (enemy.Hitpoints <= 3 && !enemy.Enraged) {
                                 enemy.SetEnragedToTrue();
                             }
 
-                            if (enemy.Hitpoints == 0)
-                            {
+                            if (enemy.Hitpoints == 0) {
                                 enemy.DeleteEntity();
                                 AddExplosion(enemy.Shape.Position, enemy.Shape.Extent);
                                 score.AddPoints();
                             }
                         }
 
-                        if (enemy.Shape.Position.Y <= 0.0f)
-                        {
+                        if (enemy.Shape.Position.Y <= 0.0f) {
                             gameOver = true;
                         }
                     });
@@ -175,8 +163,7 @@ namespace Galaga.GalagaStates {
             int strategyNumber = rand.Next(3);
 
             squadron = null;
-            switch (squadronNumber)
-            {
+            switch (squadronNumber) {
                 case 0:
                     squadron = new PyramidSquadron();
                     break;
@@ -191,8 +178,7 @@ namespace Galaga.GalagaStates {
             squadron.CreateEnemies(enemyStridesBlue, enemyStridesGreen, speedIncrease);
 
             strategy = null;
-            switch (strategyNumber)
-            {
+            switch (strategyNumber) {
                 case 0:
                     strategy = new NoMove();
                     break;
@@ -238,8 +224,7 @@ namespace Galaga.GalagaStates {
         }
 
         public void KeyRelease(KeyboardKey key) {
-            switch (key)
-            {
+            switch (key) {
                 case KeyboardKey.Space:
                     playerShots.AddEntity(new PlayerShot(player.GetPosition(), playerShotImage));
                     break;
@@ -271,6 +256,6 @@ namespace Galaga.GalagaStates {
                     break;
             }
         }
-        
+
     }
 }

@@ -1,6 +1,6 @@
 using System;
 
-namespace Galaga.GalagaStates {
+namespace Galaga {
     public enum GameStateType {
         GameRunning,
         GamePaused,
@@ -10,30 +10,21 @@ namespace Galaga.GalagaStates {
 
     public class StateTransformer {
         public static GameStateType TransformStringToState(string state) {
-            switch (state) {
-                case "GAME_RUNNING": 
-                    return GameStateType.GameRunning;
-                case "GAME_PAUSED": 
-                    return GameStateType.GamePaused;
-                case "MAIN_MENU": 
-                    return GameStateType.MainMenu;
-                default:
-                    throw new ArgumentException("Wrong string mate");
-            }
+            return state switch {
+                "GAME_RUNNING" => GameStateType.GameRunning,
+                "GAME_PAUSED" => GameStateType.GamePaused,
+                "MAIN_MENU" => GameStateType.MainMenu,
+                _ => throw new ArgumentException("Wrong string mate"),
+            };
         }
-        
-        public static string TransformStateToString(GameStateType state) {
-            switch(state) {
-                case GameStateType.GameRunning:
-                    return "GAME_RUNNING";
-                case GameStateType.GamePaused:
-                    return "GAME_PAUSED";
-                case GameStateType.MainMenu:
-                    return "MAIN_MENU";
-                default:
-                    throw new ArgumentException("Input to TransformStateToString was null");
-            }
 
-        }   
+        public static string TransformStateToString(GameStateType state) {
+            return state switch {
+                GameStateType.GameRunning => "GAME_RUNNING",
+                GameStateType.GamePaused => "GAME_PAUSED",
+                GameStateType.MainMenu => "MAIN_MENU",
+                _ => throw new ArgumentException("Input to TransformStateToString was null"),
+            };
+        }
     }
 }

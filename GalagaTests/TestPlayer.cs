@@ -1,13 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using DIKUArcade;
 using DIKUArcade.Entities;
 using DIKUArcade.Events;
 using DIKUArcade.Graphics;
 using DIKUArcade.GUI;
 using DIKUArcade.Math;
-using DIKUArcade.Timers;
 using Galaga;
 using NUnit.Framework;
 
@@ -15,17 +13,15 @@ namespace GalagaTests {
 
     [TestFixture]
     public class TestPlayer {
-        Player player;
-        GameEventBus eventBus = GalagaBus.GetBus();
-
-        public static bool initialized = false;
+        private Player? player;
+        private readonly GameEventBus eventBus = GalagaBus.GetBus();
+        private bool initialized;
 
         [SetUp]
         public void Setup() {
             Window.CreateOpenGLContext();
 
-            if (!initialized)
-            {
+            if (!initialized) {
                 eventBus.InitializeEventBus(new List<GameEventType> { GameEventType.InputEvent, GameEventType.PlayerEvent, GameEventType.GameStateEvent });
             }
             initialized = true;
@@ -40,7 +36,7 @@ namespace GalagaTests {
 
         [Test]
         public void TestPlayerMovementRight() {
-            var startingPosition = player.GetPosition();
+            Vec2F? startingPosition = player?.GetPosition();
 
             eventBus.RegisterEvent(new GameEvent {
                 EventType = GameEventType.PlayerEvent,
@@ -53,15 +49,15 @@ namespace GalagaTests {
                     EventType = GameEventType.PlayerEvent,
                     Message = "STOP_MOVE_RIGHT"
                 });
-                Assert.Greater(startingPosition.X, player.GetPosition().X);
+                Assert.Greater(startingPosition?.X, player?.GetPosition().X);
             }
 
-            Thread thread = new Thread(Work);
+            Thread thread = new(Work);
         }
 
         [Test]
         public void TestPlayerMovementLeft() {
-            var startingPosition = player.GetPosition();
+            Vec2F? startingPosition = player?.GetPosition();
 
             eventBus.RegisterEvent(new GameEvent {
                 EventType = GameEventType.PlayerEvent,
@@ -74,10 +70,10 @@ namespace GalagaTests {
                     EventType = GameEventType.PlayerEvent,
                     Message = "STOP_MOVE_LEFT"
                 });
-                Assert.Less(startingPosition.X, player.GetPosition().X);
+                Assert.Less(startingPosition?.X, player?.GetPosition().X);
             }
 
-            Thread thread = new Thread(Work);
+            Thread thread = new(Work);
         }
 
         [Test]

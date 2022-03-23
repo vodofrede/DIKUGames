@@ -1,0 +1,9 @@
+root = true
+
+[*.cs]
+# ignore warning to make field readonly
+dotnet_diagnostic.IDE0044.severity = none
+# ignore compound assignment
+dotnet_diagnostic.IDE0074.severity = none
+# ignore new expression can be simplified
+dotnet_diagnostic.IDE0090.severity = none

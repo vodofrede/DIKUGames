@@ -5,13 +5,9 @@ using DIKUArcade.State;
 
 namespace Galaga.GalagaStates {
     public class GamePaused : IGameState {
-        
+
         private static GamePaused instance = null;
-        private Entity backGroundImage;
-        private Text[] menuButtons;
-        private int activeMenuButton;
-        private int maxMenuButtons;
-    
+
         public static IGameState GetInstance() {
             return instance ?? (instance = new GamePaused());
         }

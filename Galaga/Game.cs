@@ -22,7 +22,7 @@ namespace Galaga {
             eventBus.InitializeEventBus(new List<GameEventType> { GameEventType.InputEvent, GameEventType.PlayerEvent, GameEventType.WindowEvent, GameEventType.GameStateEvent });
             eventBus.Subscribe(GameEventType.WindowEvent, this);
             eventBus.Subscribe(GameEventType.GameStateEvent, stateMachine);
-            
+
             // key input forwarding
             window.SetKeyEventHandler(KeyHandler);
         }
@@ -41,7 +41,7 @@ namespace Galaga {
 
         private void KeyHandler(KeyboardAction action, KeyboardKey key) {
             stateMachine.ActiveState.HandleKeyEvent(action, key);
-        } 
+        }
 
         public override void Render() {
             window.Clear();
@@ -53,7 +53,5 @@ namespace Galaga {
             GalagaBus.GetBus().ProcessEventsSequentially();
             stateMachine.ActiveState.UpdateState();
         }
-
-        
     }
 }

@@ -34,11 +34,13 @@
     "RoslynExtensionsOptions": {
         "enableAnalyzersSupport": true,
         "enableImportCompletion": true,
-        "enableDecompilationSupport": true
+        "enableDecompilationSupport": true,
+        "enableEditorConfigSupport": true
     },
     "RenameOptions": {
         "RenameInComments": true,
         "RenameOverloads": true,
         "RenameInStrings": true
-    }
+    },
+    "IgnoredCodeIssues": {}
 }

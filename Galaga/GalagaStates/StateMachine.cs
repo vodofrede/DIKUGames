@@ -1,6 +1,4 @@
-using System;
 using DIKUArcade.Events;
-using DIKUArcade.Input;
 using DIKUArcade.State;
 
 namespace Galaga.GalagaStates {
@@ -13,35 +11,30 @@ namespace Galaga.GalagaStates {
             GalagaBus.GetBus().Subscribe(GameEventType.GameStateEvent, this);
             GalagaBus.GetBus().Subscribe(GameEventType.InputEvent, this);
             SwitchState(GameStateType.MainMenu);
-            GameRunning.GetInstance();
-            GamePaused.GetInstance();
+            _ = GameRunning.GetInstance();
+            _ = GamePaused.GetInstance();
         }
 
         public void ProcessEvent(GameEvent gameEvent) {
 
-            switch (gameEvent.EventType)
-            {
+            switch (gameEvent.EventType) {
                 case GameEventType.GameStateEvent:
-                    if (gameEvent.StringArg1 == "GAME_RUNNING")
-                    {
+                    if (gameEvent.StringArg1 == "GAME_RUNNING") {
                         SwitchState(GameStateType.GameRunning);
                     }
 
-                    if (gameEvent.StringArg1 == "MAIN_MENU")
-                    {
+                    if (gameEvent.StringArg1 == "MAIN_MENU") {
                         SwitchState(GameStateType.MainMenu);
                     }
 
-                    if (gameEvent.StringArg1 == "GAME_PAUSED")
-                    {
+                    if (gameEvent.StringArg1 == "GAME_PAUSED") {
                         SwitchState(GameStateType.GamePaused);
                     }
 
                     break;
 
                 case GameEventType.InputEvent:
-                    if (gameEvent.Message == "CLOSE_WINDOW")
-                    {
+                    if (gameEvent.Message == "CLOSE_WINDOW") {
                         GalagaBus.GetBus().RegisterEvent(
                             new GameEvent {
                                 EventType = GameEventType.GameStateEvent,
@@ -53,12 +46,29 @@ namespace Galaga.GalagaStates {
                     }
 
                     break;
+                case GameEventType.PlayerEvent:
+                    break;
+                case GameEventType.GraphicsEvent:
+                    break;
+                case GameEventType.ControlEvent:
+                    break;
+                case GameEventType.MovementEvent:
+                    break;
+                case GameEventType.SoundEvent:
+                    break;
+                case GameEventType.StatusEvent:
+                    break;
+                case GameEventType.WindowEvent:
+                    break;
+                case GameEventType.TimedEvent:
+                    break;
+                default:
+                    break;
             }
         }
 
         private void SwitchState(GameStateType stateType) {
-            switch (stateType)
-            {
+            switch (stateType) {
                 case GameStateType.MainMenu:
                     ActiveState = MainMenu.GetInstance();
                     break;
@@ -67,6 +77,8 @@ namespace Galaga.GalagaStates {
                     break;
                 case GameStateType.GamePaused:
                     ActiveState = GamePaused.GetInstance();
+                    break;
+                default:
                     break;
             }
         }

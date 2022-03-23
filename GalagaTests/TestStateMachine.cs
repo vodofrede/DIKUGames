@@ -1,17 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Numerics;
 using DIKUArcade.Events;
 using DIKUArcade.GUI;
-using Galaga;
 using Galaga.GalagaStates;
 using NUnit.Framework;
 
 namespace GalagaTests {
     [TestFixture]
     public class StateMachineTesting {
-        private GameEventBus? eventBus = GalagaBus.GetBus();
         private StateMachine? stateMachine;
 
         [SetUp]
@@ -31,7 +25,7 @@ namespace GalagaTests {
 
         [Test]
         public void TestMainMenuToGameRunning() {
-            stateMachine.ProcessEvent(
+            stateMachine?.ProcessEvent(
                 new GameEvent {
                     EventType = GameEventType.GameStateEvent,
                     Message = "CHANGE_STATE",
@@ -44,7 +38,7 @@ namespace GalagaTests {
 
         [Test]
         public void TestGamePaused() {
-            stateMachine.ProcessEvent(new GameEvent {
+            stateMachine?.ProcessEvent(new GameEvent {
                 EventType = GameEventType.GameStateEvent,
                 Message = "CHANGE_STATE",
                 StringArg1 = "GAME_PAUSED"
@@ -55,7 +49,7 @@ namespace GalagaTests {
 
         [Test]
         public void TestGameQuitToMainMenu() {
-            stateMachine.ProcessEvent(
+            stateMachine?.ProcessEvent(
                 new GameEvent {
                     EventType = GameEventType.GameStateEvent,
                     Message = "CHANGE_STATE",
