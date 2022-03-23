@@ -1,15 +1,48 @@
-using NUnit.Framework;
+// using System.Collections.Generic;
+// using System.IO;
+// using DIKUArcade.Entities;
+// using DIKUArcade.Events;
+// using DIKUArcade.Graphics;
+// using Galaga;
+// using NUnit.Framework;
+// using DIKUArcade.GUI;
 
-namespace GalagaTests;
+// namespace GalagaTests;
 
-[TestFixture]
-public class TestEnemy {
-    [SetUp]
-    public void Setup() {
-    }
+// [TestFixture]
+// public class TestEnemy {
 
-    [Test]
-    public void Test1() {
-        Assert.AreEqual(1,1);
-    }
-}   
+//     IBaseImage? enemyStride;
+//     IBaseImage? alternativeEnemyStride;
+
+//     Enemy? enemy;
+    
+//     [SetUp]
+//     public void Setup() {
+//         Window.CreateOpenGLContext();
+
+//         enemyStride = new ImageStride(80, ImageStride.CreateStrides(4, Path.Combine("Assets", "Images", "BlueMonster.png")));
+//         alternativeEnemyStride = new ImageStride(80, ImageStride.CreateStrides(2, Path.Combine("Assets", "Images", "GreenMonster.png")));
+
+//         enemy = new Enemy(
+//             new DynamicShape(0.3f, 0.9f, 0.1f, 0.1f),
+//             enemyStride,
+//             alternativeEnemyStride,
+//             1.0f
+//         );
+//     }
+
+//     [Test]
+//     public void TestEnraged() {
+//         enemy?.SetEnragedToTrue();
+//         Assert.AreEqual(4.5f, enemy?.Speed);
+//         Assert.True(enemy?.Enraged);
+//     }
+
+//     [Test]
+//     public void TestDecreaseHitpoints() {
+//         var initialHitpoints = enemy?.Hitpoints;
+//         enemy?.DecreaseHitpoints();
+//         Assert.Less(initialHitpoints, enemy?.Hitpoints);
+//     }
+// }   

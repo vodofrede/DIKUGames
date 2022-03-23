@@ -6,6 +6,6 @@ public class GalagaBus {
     private static GameEventBus eventBus;
 
     public static GameEventBus GetBus() {
-        return GalagaBus.eventBus ?? (GalagaBus.eventBus = new GameEventBus());
+        return eventBus ?? (eventBus = new GameEventBus());
     }
 }
