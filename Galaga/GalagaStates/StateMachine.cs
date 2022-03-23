@@ -1,48 +1,47 @@
-using DIKUArcade.Events;
-using DIKUArcade.State;
-using DIKUArcade.Input;
 using System;
+using DIKUArcade.Events;
+using DIKUArcade.Input;
+using DIKUArcade.State;
 
 namespace Galaga.GalagaStates {
 
-public class StateMachine : IGameEventProcessor {
+    public class StateMachine : IGameEventProcessor {
 
-    public IGameState ActiveState { get; private set; }
+        public IGameState ActiveState { get; private set; }
 
-    public StateMachine() {
-        GalagaBus.GetBus().Subscribe(GameEventType.GameStateEvent, this);
-        GalagaBus.GetBus().Subscribe(GameEventType.InputEvent, this);
-        ActiveState = MainMenu.GetInstance();
-        GameRunning.GetInstance();
-        GamePaused.GetInstance();
-    }
+        public StateMachine() {
+            GalagaBus.GetBus().Subscribe(GameEventType.GameStateEvent, this);
+            GalagaBus.GetBus().Subscribe(GameEventType.InputEvent, this);
+            SwitchState(GameStateType.MainMenu);
+            GameRunning.GetInstance();
+            GamePaused.GetInstance();
+        }
 
-    public void ProcessEvent(GameEvent gameEvent) {
+        public void ProcessEvent(GameEvent gameEvent) {
 
-        switch (gameEvent.EventType) {
-            case GameEventType.GameStateEvent:
-                if (gameEvent.StringArg1 == "GAME_RUNNING") {
-                    if (ActiveState != GameRunning.GetInstance()) {
-                        ActiveState = GameRunning.GetInstance();
-                    } 
-                }
-
-                if (gameEvent.StringArg1 == "MAIN_MENU") {
-                    if (ActiveState != MainMenu.GetInstance()) {
-                        ActiveState = GameRunning.GetInstance();                     
+            switch (gameEvent.EventType)
+            {
+                case GameEventType.GameStateEvent:
+                    if (gameEvent.StringArg1 == "GAME_RUNNING")
+                    {
+                        SwitchState(GameStateType.GameRunning);
                     }
-                }
 
-                if (gameEvent.Message == "GAME_PAUSED") {
-                    if (ActiveState != GamePaused.GetInstance()) {
-                        ActiveState = GamePaused.GetInstance();                 
+                    if (gameEvent.StringArg1 == "MAIN_MENU")
+                    {
+                        SwitchState(GameStateType.MainMenu);
                     }
-                }                
 
-                break;
+                    if (gameEvent.StringArg1 == "GAME_PAUSED")
+                    {
+                        SwitchState(GameStateType.GamePaused);
+                    }
 
-            case GameEventType.InputEvent:
-                if (gameEvent.Message == "CLOSE_WINDOW") {
+                    break;
+
+                case GameEventType.InputEvent:
+                    if (gameEvent.Message == "CLOSE_WINDOW")
+                    {
                         GalagaBus.GetBus().RegisterEvent(
                             new GameEvent {
                                 EventType = GameEventType.GameStateEvent,
@@ -53,22 +52,23 @@ public class StateMachine : IGameEventProcessor {
                         );
                     }
 
-                break;                
+                    break;
+            }
+        }
+
+        private void SwitchState(GameStateType stateType) {
+            switch (stateType)
+            {
+                case GameStateType.MainMenu:
+                    ActiveState = MainMenu.GetInstance();
+                    break;
+                case GameStateType.GameRunning:
+                    ActiveState = GameRunning.GetInstance();
+                    break;
+                case GameStateType.GamePaused:
+                    ActiveState = GamePaused.GetInstance();
+                    break;
+            }
         }
     }
-
-    private void SwitchState(GameStateType stateType) {
-        switch (stateType) {
-            case GameStateType.MainMenu:
-                ActiveState = MainMenu.GetInstance();
-                break;
-            case GameStateType.GameRunning:
-                ActiveState = GameRunning.GetInstance();
-                break;
-            case GameStateType.GamePaused:
-                ActiveState = GamePaused.GetInstance();
-                break;
-        }
-    }   
-}
 }

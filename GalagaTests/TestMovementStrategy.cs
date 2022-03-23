@@ -1,65 +1,81 @@
-// using System.IO;
-// using DIKUArcade.Graphics;
-// using DIKUArcade.Math;
-// using Galaga;
-// using Galaga.MovementStrategy;
-// using Galaga.Squadron;
-// using NUnit.Framework;
-// using DIKUArcade.GUI;
+using System.Collections.Generic;
+using System.IO;
+using DIKUArcade.Graphics;
+using DIKUArcade.GUI;
+using DIKUArcade.Math;
+using Galaga;
+using Galaga.MovementStrategy;
+using Galaga.Squadron;
+using NUnit.Framework;
 
 
-// namespace GalagaTests;
+namespace GalagaTests;
 
-// [TestFixture]
-// public class TestMovementStrategy {
+[TestFixture]
+public class TestMovementStrategy {
 
-//     ISquadron squadron;
-//     IMovementStrategy strategy;
-//     float speed;
+    List<Image> enemyStride;
+    List<Image> alternativeEnemyStride;
 
-//     [SetUp]
-//     public void Setup() {
-//         Window.CreateOpenGLContext();
+    ISquadron squadron;
+    IMovementStrategy strategy;
+    float speed;
 
-//         var enemyStride = ImageStride.CreateStrides(4, Path.Combine("Assets", "Images", "BlueMonster.png"));
-//         var alternativeEnemyStride = ImageStride.CreateStrides(2, Path.Combine("Assets", "Images", "GreenMonster.png"));
+    [SetUp]
+    public void Setup() {
+        Window.CreateOpenGLContext();
 
-//         speed = 0.003f;
+        enemyStride = ImageStride.CreateStrides(4, Path.Combine("..", "Galaga", "Assets", "Images", "BlueMonster.png"));
+        alternativeEnemyStride = ImageStride.CreateStrides(2, Path.Combine("..", "Galaga", "Assets", "Images", "GreenMonster.png"));
 
-//         squadron = new SquareSquadron();
-//         squadron.CreateEnemies(enemyStride, alternativeEnemyStride, speed);
-//     }
+        speed = 0.003f;
+    }
 
-//     [Test]
-//     public void TestDownStrategy() {
-//         strategy = new Down();
-//         strategy.MoveEnemies(squadron.Enemies);
+    [Test]
+    public void TestDownStrategy() {
+        squadron = new SquareSquadron();
+        squadron.CreateEnemies(enemyStride, alternativeEnemyStride, speed);
 
-//         foreach (Enemy enemy in squadron.Enemies)
-//         {
-//             Assert.AreEqual(enemy.StartingPosition.X, enemy.Shape.Position.X);
-//             Assert.AreEqual(enemy.StartingPosition.Y, enemy.Shape.Position.Y + speed);
-//         }
-//     }
+        strategy = new Down();
+        strategy.MoveEnemies(squadron.Enemies);
+        strategy.MoveEnemies(squadron.Enemies);
+        strategy.MoveEnemies(squadron.Enemies);
+        strategy.MoveEnemies(squadron.Enemies);
+        strategy.MoveEnemies(squadron.Enemies);
 
-//     [Test]
-//     public void TestNoMoveStrategy() {
-//         strategy = new NoMove();
-//         strategy.MoveEnemies(squadron.Enemies);
+        foreach (Enemy enemy in squadron.Enemies)
+        {
+            Assert.AreEqual(enemy.StartingPosition.X, enemy.Shape.Position.X);
+            Assert.Less(enemy.Shape.Position.Y, enemy.StartingPosition.Y);
+        }
+    }
 
-//         foreach (Enemy enemy in squadron.Enemies) {
-//             Assert.AreEqual(enemy.StartingPosition, enemy.Shape.Position);
-//         }
-//     }
+    [Test]
+    public void TestNoMoveStrategy() {
+        squadron = new SquareSquadron();
+        squadron.CreateEnemies(enemyStride, alternativeEnemyStride, speed);
 
-//     [Test]
-//     public void TestZigZagDownStrategy() {
-//         strategy = new ZigZagDown();
-//         strategy.MoveEnemies(squadron.Enemies);
+        strategy = new NoMove();
+        strategy.MoveEnemies(squadron.Enemies);
 
-//         foreach (Enemy enemy in squadron.Enemies)
-//         {
-//             Assert.AreNotEqual(enemy.StartingPosition, enemy.Shape.Position);
-//         }
-//     }
-// }
+        foreach (Enemy enemy in squadron.Enemies)
+        {
+            Assert.AreEqual(enemy.StartingPosition.X, enemy.Shape.Position.X);
+            Assert.AreEqual(enemy.StartingPosition.Y, enemy.Shape.Position.Y);
+        }
+    }
+
+    [Test]
+    public void TestZigZagDownStrategy() {
+        squadron = new SquareSquadron();
+        squadron.CreateEnemies(enemyStride, alternativeEnemyStride, speed);
+
+        strategy = new ZigZagDown();
+        strategy.MoveEnemies(squadron.Enemies);
+
+        foreach (Enemy enemy in squadron.Enemies)
+        {
+            Assert.AreNotEqual(enemy.StartingPosition, enemy.Shape.Position);
+        }
+    }
+}

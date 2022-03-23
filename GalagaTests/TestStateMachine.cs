@@ -1,82 +1,69 @@
-// using System;
-// using System.Collections.Generic;
-// using System.IO;
-// using System.Numerics;
-// using DIKUArcade.Events;
-// using DIKUArcade.GUI;
-// using Galaga;
-// using Galaga.GalagaStates;
-// using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Numerics;
+using DIKUArcade.Events;
+using DIKUArcade.GUI;
+using Galaga;
+using Galaga.GalagaStates;
+using NUnit.Framework;
 
-// namespace GalagaTests {
-//     [TestFixture]
-//     public class StateMachineTesting {
-//         private GameEventBus? eventBus;
-//         private StateMachine? stateMachine;
+namespace GalagaTests {
+    [TestFixture]
+    public class StateMachineTesting {
+        private GameEventBus? eventBus = GalagaBus.GetBus();
+        private StateMachine? stateMachine;
 
-//         [SetUp]
-//         public void InitiateStateMachine() {
-//             Window.CreateOpenGLContext();
+        [SetUp]
+        public void Setup() {
+            Window.CreateOpenGLContext();
 
-//             // (1) Initialize a GalagaBus with proper GameEventTypes
-//             eventBus = GalagaBus.GetBus();
-//             eventBus.InitializeEventBus(new List<GameEventType> { GameEventType.GameStateEvent });
+            stateMachine = new StateMachine();
 
-//             // (2) Instantiate the StateMachine
-//             stateMachine = new StateMachine();
+            // eventBus.Subscribe(GameEventType.GameStateEvent, this);
+        }
 
-//             // (3) Subscribe the GalagaBus to proper GameEventTypes
-//             //  and GameEventProcessors
-//             eventBus.Subscribe(GameEventType.GameStateEvent, stateMachine);
-//         } 
 
-        
-//         [Test]
-//         public void TestInitialState() {
-//             Assert.IsInstanceOf<MainMenu>(stateMachine?.ActiveState);
-//         }
+        [Test]
+        public void TestInitialState() {
+            Assert.IsInstanceOf<MainMenu>(stateMachine?.ActiveState);
+        }
 
-//         [Test]
-//         public void TestMainMenuToGameRunning() {
-//             GalagaBus.GetBus().RegisterEvent(
-//                 new GameEvent{
-//                     EventType = GameEventType.GameStateEvent,
-//                     Message =  "CHANGE_STATE",
-//                     StringArg1 = "GAME_RUNNING"
-//                 }
-//             );
+        [Test]
+        public void TestMainMenuToGameRunning() {
+            stateMachine.ProcessEvent(
+                new GameEvent {
+                    EventType = GameEventType.GameStateEvent,
+                    Message = "CHANGE_STATE",
+                    StringArg1 = "GAME_RUNNING"
+                }
+            );
 
-//             GalagaBus.GetBus().ProcessEventsSequentially();
+            Assert.IsInstanceOf<GameRunning>(stateMachine?.ActiveState);
+        }
 
-//             Assert.IsInstanceOf<GameRunning>(stateMachine?.ActiveState);
-//         }
+        [Test]
+        public void TestGamePaused() {
+            stateMachine.ProcessEvent(new GameEvent {
+                EventType = GameEventType.GameStateEvent,
+                Message = "CHANGE_STATE",
+                StringArg1 = "GAME_PAUSED"
+            });
 
-//         [Test]
-//         public void TestGamePaused() {
-//             GalagaBus.GetBus().RegisterEvent(
-//                 new GameEvent{
-//                     EventType = GameEventType.GameStateEvent,
-//                     Message = "CHANGE_STATE",
-//                     StringArg1 = "GAME_PAUSED"
-//                 }
-//             );
+            Assert.IsInstanceOf<GamePaused>(stateMachine?.ActiveState);
+        }
 
-//             GalagaBus.GetBus().ProcessEventsSequentially();
-//             Assert.IsInstanceOf<GamePaused>(stateMachine?.ActiveState);
-//         }
+        [Test]
+        public void TestGameQuitToMainMenu() {
+            stateMachine.ProcessEvent(
+                new GameEvent {
+                    EventType = GameEventType.GameStateEvent,
+                    Message = "CHANGE_STATE",
+                    StringArg1 = "MAIN_MENU"
+                }
+            );
 
-//         [Test]
-//         public void TestGameQuitToMainMenu() {
-//             GalagaBus.GetBus().RegisterEvent(
-//                 new GameEvent {
-//                     EventType = GameEventType.GameStateEvent,
-//                     Message = "CHANGE_STATE",
-//                     StringArg1 = "MAIN_MENU"
-//                 }
-//             );
-
-//             GalagaBus.GetBus().ProcessEventsSequentially();
-//             Assert.IsInstanceOf<MainMenu>(stateMachine?.ActiveState);
-//         }
-//     }
-// }
+            Assert.IsInstanceOf<MainMenu>(stateMachine?.ActiveState);
+        }
+    }
+}

@@ -19,8 +19,11 @@ public class Player : IGameEventProcessor {
     }
 
     public void ProcessEvent(GameEvent gameEvent) {
-        if (gameEvent.EventType == GameEventType.PlayerEvent) {
-            switch (gameEvent.Message) {
+
+        if (gameEvent.EventType == GameEventType.PlayerEvent)
+        {
+            switch (gameEvent.Message)
+            {
                 case "START_MOVE_RIGHT":
                     SetMoveLeft(false);
                     SetMoveRight(true);
@@ -52,24 +55,29 @@ public class Player : IGameEventProcessor {
     }
 
     private void SetMoveLeft(bool val) {
-        if (val) {
+        if (val)
+        {
             moveLeft = -MOVEMENT_SPEED;
         }
-        else {
-            moveLeft = 0.0f;          
+        else
+        {
+            moveLeft = 0.0f;
         }
-        
+
         UpdateDirection();
     }
 
     private void SetMoveRight(bool val) {
-        if (val) {
+        if (val)
+        {
             moveRight = MOVEMENT_SPEED;
 
-        } else {
+        }
+        else
+        {
             moveRight = 0.0f;
-        }       
-        
+        }
+
         UpdateDirection();
     }
 

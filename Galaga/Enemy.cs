@@ -18,7 +18,8 @@ namespace Galaga {
         public Enemy(DynamicShape shape, IBaseImage image, IBaseImage altImage, float speed)
             : base(shape, image) {
             this.altImage = altImage;
-            this.startingPosition = shape.Position;
+            this.startingPosition = new Vec2F(shape.Position.X, shape.Position.Y);
+
             this.speed = speed;
         }
 

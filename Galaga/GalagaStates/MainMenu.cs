@@ -12,15 +12,15 @@ namespace Galaga.GalagaStates;
 public class MainMenu : IGameState {
 
     private static MainMenu instance = null;
-    
+
     private Entity backGroundImage = new Entity(
         new DynamicShape(new Vec2F(0.45f, 0.1f), new Vec2F(1.0f, 1.0f)),
         new Image(Path.Combine("Assets", "Images", "TitleImage.png"))
         );
     private Text[] menuButtons = new Text[] {
-        new Text(string.Format("New Game"), new Vec2F(0.5f, 0.5f), new Vec2F(0.1f, 0.1f)), 
+        new Text(string.Format("New Game"), new Vec2F(0.5f, 0.5f), new Vec2F(0.1f, 0.1f)),
         new Text(string.Format("Quit"), new Vec2F(0.5f, 0.4f), new Vec2F(0.1f, 0.1f))
-    }; 
+    };
     private int activeMenuButton;
     private int maxMenuButtons;
 
@@ -30,20 +30,24 @@ public class MainMenu : IGameState {
 
     public void RenderState() {
 
+
         // render background image
-        backGroundImage.RenderEntity(); 
-        
+        backGroundImage.RenderEntity();
+
         // render menu buttons
-        for (int i = 0; i < menuButtons.Length; i++) {
-            
-            if (i == activeMenuButton) {
+        for (int i = 0; i < menuButtons.Length; i++)
+        {
+
+            if (i == activeMenuButton)
+            {
                 menuButtons[i].SetColor(new Vec3I(255, 0, 0));
             }
-            
-            else {
+
+            else
+            {
                 menuButtons[i].SetColor(new Vec3I(255, 255, 255));
             }
-            
+
             menuButtons[i].SetFontSize(1000);
             menuButtons[i].RenderText();
         }
@@ -56,13 +60,16 @@ public class MainMenu : IGameState {
 
     public void UpdateState() {
 
-        for (int i = 0; i < menuButtons.Length; i++) {
-            
-            if (i == activeMenuButton) {
+        for (int i = 0; i < menuButtons.Length; i++)
+        {
+
+            if (i == activeMenuButton)
+            {
                 menuButtons[i].SetColor(new Vec3I(255, 0, 0));
             }
-            
-            else {
+
+            else
+            {
                 menuButtons[i].SetColor(new Vec3I(255, 255, 255));
             }
 
@@ -73,7 +80,8 @@ public class MainMenu : IGameState {
     }
 
     public void HandleKeyEvent(KeyboardAction action, KeyboardKey key) {
-        switch (action) {
+        switch (action)
+        {
             case KeyboardAction.KeyPress:
                 KeyPress(key);
                 break;
@@ -81,9 +89,10 @@ public class MainMenu : IGameState {
     }
 
     public void KeyPress(KeyboardKey keyboardKey) {
-        switch (keyboardKey) {
+        switch (keyboardKey)
+        {
 
-            
+
             case KeyboardKey.Escape:
                 GalagaBus.GetBus().RegisterEvent(new GameEvent {
                     EventType = GameEventType.WindowEvent,
@@ -91,29 +100,34 @@ public class MainMenu : IGameState {
                     Message = "CLOSE_WINDOW"
                 });
                 break;
-            
+
             case KeyboardKey.Up:
-                if (activeMenuButton < menuButtons.Length - 1) {
+                if (activeMenuButton < menuButtons.Length - 1)
+                {
                     activeMenuButton++;
                 }
-                else {
+                else
+                {
                     activeMenuButton = 0;
                 }
                 UpdateState();
                 break;
 
             case KeyboardKey.Down:
-                if (activeMenuButton > 0) {
+                if (activeMenuButton > 0)
+                {
                     activeMenuButton--;
                 }
-                else {
+                else
+                {
                     activeMenuButton = menuButtons.Length - 1;
                 }
                 UpdateState();
                 break;
-                
+
             case KeyboardKey.Enter:
-                if (activeMenuButton == 0) {
+                if (activeMenuButton == 0)
+                {
                     GalagaBus.GetBus().RegisterEvent(
                         new GameEvent {
                             EventType = GameEventType.GameStateEvent,
@@ -121,8 +135,9 @@ public class MainMenu : IGameState {
                             Message = "CHANGE_STATE",
                             StringArg1 = "GAME_RUNNING"
                         });
-                    }
-                else if (activeMenuButton == 1) {
+                }
+                else if (activeMenuButton == 1)
+                {
                     GalagaBus.GetBus().RegisterEvent(
                         new GameEvent {
                             EventType = GameEventType.WindowEvent,
@@ -130,9 +145,9 @@ public class MainMenu : IGameState {
                             Message = "CHANGE_STATE",
                             StringArg1 = "CLOSE_WINDOW"
                         });
-                    }
-            break;
-                
+                }
+                break;
+
+        }
     }
-}
 }
