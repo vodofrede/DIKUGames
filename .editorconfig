@@ -7,3 +7,5 @@ dotnet_diagnostic.IDE0044.severity = none
 dotnet_diagnostic.IDE0074.severity = none
 # ignore new expression can be simplified
 dotnet_diagnostic.IDE0090.severity = none
+# dont' automatically fill out every case in switch statements
+dotnet_diagnostic.IDE0010.severity = none

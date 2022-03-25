@@ -44,23 +44,6 @@ namespace Galaga.GalagaStates {
                             }
                         );
                     }
-
-                    break;
-                case GameEventType.PlayerEvent:
-                    break;
-                case GameEventType.GraphicsEvent:
-                    break;
-                case GameEventType.ControlEvent:
-                    break;
-                case GameEventType.MovementEvent:
-                    break;
-                case GameEventType.SoundEvent:
-                    break;
-                case GameEventType.StatusEvent:
-                    break;
-                case GameEventType.WindowEvent:
-                    break;
-                case GameEventType.TimedEvent:
                     break;
                 default:
                     break;
