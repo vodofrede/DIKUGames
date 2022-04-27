@@ -6,7 +6,7 @@ namespace Breakout {
         private static string metaPattern = @"(Meta:\n)((.*\n)*)(Meta\/)";
         private static string legendPattern = @"(Legend:\n)((.*\n)*)(Legend\/)";
 
-        public static void ParseFile(string filePath) {
+        public static Map ParseFile(string filePath) {
             string file = File.ReadAllText(filePath);
             string normalized = Regex.Replace(file, @"\r\n|\n\r|\n|\r", "\n");
             
@@ -18,6 +18,7 @@ namespace Breakout {
             string meta = metaRegex.Match(normalized).Groups[2].ToString();
             string legend = legendRegex.Match(normalized).Groups[2].ToString();
 
+            throw new NotImplementedException();
             // match symbols to blocks (make hashmap?)
 
             // Console.WriteLine(map);
