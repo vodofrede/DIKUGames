@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using DIKUArcade;
 using DIKUArcade.Events;
 using DIKUArcade.GUI;
 using DIKUArcade.Input;
-using DIKUArcade.Physics;
 using Galaga.GalagaStates;
 
 namespace Galaga {
@@ -18,7 +15,7 @@ namespace Galaga {
             stateMachine = new StateMachine();
 
             // event bus
-            var eventBus = GalagaBus.GetBus();
+            GameEventBus eventBus = GalagaBus.GetBus();
             eventBus.InitializeEventBus(new List<GameEventType> { GameEventType.InputEvent, GameEventType.PlayerEvent, GameEventType.WindowEvent, GameEventType.GameStateEvent });
             eventBus.Subscribe(GameEventType.WindowEvent, this);
             eventBus.Subscribe(GameEventType.GameStateEvent, stateMachine);

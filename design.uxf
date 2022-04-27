@@ -1,0 +1,55 @@
+<diagram program="umletino" version="14.4.0-SNAPSHOT"><zoom_level>10</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>64</x><y>560</y><w>210</w><h>40</h></coordinates><panel_attributes>&lt;&lt;Class&gt;&gt;
+Block
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>614</x><y>440</y><w>230</w><h>200</h></coordinates><panel_attributes>&lt;&lt;Class&gt;&gt;
+Player
+--
+-entity: Entity
+-shape: DynamicShape
+-moveLeft: float
+-moveRight. float
+--
+#Player(): Player
+#SetMoveLeft(bool val)
+#SetMoveRight(bool val)
+#Move()
+#Render()
+#ProcessEvent(GameEvent gameEvent)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>334</x><y>430</y><w>210</w><h>130</h></coordinates><panel_attributes>&lt;&lt;Interface&gt;&gt;
+IBlock
+--
+#GetHitpoints(): int
+#DecreaseHitpoints(): BlockEffect
+#GetPosition(): Vec2F
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>263</x><y>540</y><w>90</w><h>50</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>70;10;10;30</additional_attributes></element><element><id>Relation</id><coordinates><x>704</x><y>390</y><w>30</w><h>70</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;10;50</additional_attributes></element><element><id>UMLClass</id><coordinates><x>610</x><y>130</y><w>140</w><h>110</h></coordinates><panel_attributes>&lt;&lt;Class&gt;&gt;
+FileLoader
+--
+allLevels: Level[]
+--
+#Loader(): Loader
+#NextLevel(): Map</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>530</x><y>350</y><w>100</w><h>30</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>80;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>700</x><y>230</y><w>30</w><h>70</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>610</x><y>280</y><w>230</w><h>120</h></coordinates><panel_attributes>&lt;&lt;Class&gt;&gt;
+Game
+--
+-player: Player
+-currentMap: Map
+--
+#Game(): Game
+#Update()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>330</x><y>210</y><w>210</w><h>190</h></coordinates><panel_attributes>&lt;&lt;Class&gt;&gt;
+Map
+--
+-name: String
+-timeLimit: int
+-width: int
+-height: int
+-blocks: IBlock[]
+-legend: HashMap&lt;String, String&gt;
+--
+#Map(): Map
+#RenderMap()
+#GetBlock(int x, int y)
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>430</x><y>390</y><w>30</w><h>60</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;10;40</additional_attributes></element><element><id>UMLClass</id><coordinates><x>60</x><y>410</y><w>210</w><h>40</h></coordinates><panel_attributes>&lt;&lt;Class&gt;&gt;
+Hardened</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>259</x><y>430</y><w>100</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>80;10;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>60</x><y>510</y><w>210</w><h>40</h></coordinates><panel_attributes>&lt;&lt;Class&gt;&gt;
+PowerUp</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>254</x><y>470</y><w>100</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>80;10;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>60</x><y>460</y><w>210</w><h>40</h></coordinates><panel_attributes>&lt;&lt;Class&gt;&gt;
+Unbreakable</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>254</x><y>520</y><w>100</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>80;10;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>330</x><y>590</y><w>210</w><h>80</h></coordinates><panel_attributes>&lt;&lt;Enum&gt;&gt;
+BlockEffect
+--
+None
+PowerUp</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>430</x><y>550</y><w>30</w><h>60</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;10;40</additional_attributes></element></diagram>
