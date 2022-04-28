@@ -9,12 +9,12 @@ namespace Breakout {
         private int width;
         private int height;
 
-        private IBlock[] blocks;
+        private List<IBlock> blocks;
         // tegn til .png-fil konvertering
         // måske burde vi lave en dedikeret "image" klasse eller bruge en eksisterende klasse fra DIKUArcade
-        private Dictionary<string, string> legend;
+        private Dictionary<char, string> legend;
         
-        public Map(string name, int timeLimit, int width, int height, IBlock[] blocks, Dictionary<string, string> legend) {
+        public Map(string name, int timeLimit, int width, int height, List<IBlock> blocks, Dictionary<char, string> legend) {
             this.name = name;
             this.timeLimit = timeLimit;
             this.width = width;
@@ -30,8 +30,8 @@ namespace Breakout {
             throw new NotImplementedException();
         }
 
-        public IBlock GetBlock(Vec2F position) {
-            return Array.Find(this.blocks, block => block.GetPosition() == position) ?? throw new ArgumentException("No block was found with position " + position);
+        public IBlock GetBlock(Vec2I position) {
+            return blocks.Find(block => block.GetPosition() == position) ?? throw new ArgumentException("No block was found with position " + position);
         }
     }
 }

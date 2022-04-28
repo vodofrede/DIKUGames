@@ -8,12 +8,11 @@ using DIKUArcade.Math;
 namespace Breakout {
 
     public class Game : DIKUGame {
-
         private Player player;
-        private FileLoader fileLoader = new FileLoader();
+        private Map map;
 
         public Game(WindowArgs windowArgs) : base(windowArgs) {
-            FileLoader.ParseFile(Path.Combine("Assets", "Levels", "level1.txt"));
+            
             // event bus
             GameEventBus eventBus = BreakoutBus.GetBus();
             eventBus.InitializeEventBus(new List<GameEventType> { GameEventType.InputEvent, GameEventType.PlayerEvent, GameEventType.WindowEvent, GameEventType.GameStateEvent });
@@ -23,6 +22,9 @@ namespace Breakout {
                 new Image(Path.Combine("Assets", "Images", "player.png"))
             );
             eventBus.Subscribe(GameEventType.PlayerEvent, player);
+
+            // load map
+            map = FileLoader.ParseFile(Path.Combine("Assets", "Levels", "level2.txt"));
         }
 
         public override void Render() {

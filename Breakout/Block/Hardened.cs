@@ -1,11 +1,12 @@
+using DIKUArcade.Graphics;
 using DIKUArcade.Math;
 
 namespace Breakout.Block {
     public class Hardened : IBlock {
         private int hitpoints = 2;
-        private Vec2F position;
+        private Vec2I position;
 
-        public Hardened(Vec2F position) {
+        public Hardened(Vec2I position) {
             this.position = position;
         }
 
@@ -16,11 +17,15 @@ namespace Breakout.Block {
             return BlockEffect.None;
         }
 
+        public BlockType GetBlockType() {
+            return BlockType.Hardened;
+        }
+
         public int GetHitpoints() {
             return hitpoints;
         }
 
-        public Vec2F GetPosition() {
+        public Vec2I GetPosition() {
             return position;
         }
     }
