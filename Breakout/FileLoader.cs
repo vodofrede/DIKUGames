@@ -49,10 +49,7 @@ namespace Breakout {
             }
 
             // parse map
-            var blocks = new EntityContainer<Block>();
-            int width = mapString.Split("\n").First().Length;
-            int height = mapString.TrimEnd('\n').Split("\n").Length;
-            
+            var blocks = new EntityContainer<Block>();            
             foreach ((string line, float y) in mapString.Split("\n").Select((v, i) => (v, (float) i))) {
                 foreach ((char c, float x) in line.Select((v, i) => (v, (float) i))) {
                     // Console.WriteLine("x: " + x + ", y: " +  y);
@@ -67,7 +64,20 @@ namespace Breakout {
                 }
             }
 
-            return new Map(name, timeLimit, width, height, blocks);
+            return new Map(name, timeLimit, blocks);
+        }
+
+        public static Map TryParseFile(string file) {
+            Map map;
+            try {
+                map = ParseFile(file);
+            } catch (Exception e) {
+                Console.WriteLine("Cannot parse level file, please make sure that the file is correctly formatted or choose another level.");
+                Console.WriteLine("Error: " + e);
+                Environment.Exit(0);
+                map = ParseFile(Path.Combine("Assets", "Levels", "empty.txt"));
+            }
+            return map;
         }
     }
 }

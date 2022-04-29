@@ -1,20 +1,16 @@
 using DIKUArcade.Entities;
 using DIKUArcade.Events;
 using DIKUArcade.Graphics;
+using DIKUArcade.Input;
 using DIKUArcade.Math;
 
 namespace Breakout {
-    public class Player : IGameEventProcessor {
-        private readonly Entity entity;
-        private readonly DynamicShape shape;
+    public class Player : Entity, IGameEventProcessor {
         private float moveLeft;
         private float moveRight;
-        private const float MOVEMENT_SPEED = 0.05f;
+        private const float MOVEMENT_SPEED = 0.035f;
 
-        public Player(DynamicShape shape, IBaseImage image) {
-            entity = new Entity(shape, image);
-            this.shape = shape;
-        }
+        public Player(IBaseImage image): base(new DynamicShape(new Vec2F(0.45f, 0.1f), new Vec2F(0.1f, 0.02f)), image) {}
 
         public void ProcessEvent(GameEvent gameEvent) {
 
@@ -43,33 +39,27 @@ namespace Breakout {
             }
         }
 
-        public void Render() {
-            entity.RenderEntity();
-        }
-
         public void Move() {
-            shape.Move();
-            shape.Position.X = Math.Clamp(shape.Position.X, 0.0f, 1f - shape.Extent.X);
+            Shape.Move();
+            Shape.Position.X = Math.Clamp(Shape.Position.X, 0.0f, 1f - Shape.Extent.X);
         }
 
-        private void SetMoveLeft(bool val) {
+        public void SetMoveLeft(bool val) {
             moveLeft = val ? -MOVEMENT_SPEED : 0.0f;
-
             UpdateDirection();
         }
 
-        private void SetMoveRight(bool val) {
+        public void SetMoveRight(bool val) {
             moveRight = val ? MOVEMENT_SPEED : 0.0f;
-
             UpdateDirection();
         }
 
         private void UpdateDirection() {
-            shape.Direction.X = moveLeft + moveRight;
+            Shape.AsDynamicShape().Direction.X = moveLeft + moveRight;
         }
 
         public Vec2F GetPosition() {
-            return shape.Position;
+            return Shape.Position;
         }
 
 
