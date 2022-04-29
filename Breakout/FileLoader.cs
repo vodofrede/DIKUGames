@@ -55,12 +55,13 @@ namespace Breakout {
             
             foreach ((string line, float y) in mapString.Split("\n").Select((v, i) => (v, (float) i))) {
                 foreach ((char c, float x) in line.Select((v, i) => (v, (float) i))) {
+                    // Console.WriteLine("x: " + x + ", y: " +  y);
                     if (legend.ContainsKey(c)) {
                         if (meta.ContainsKey(c)) {
                             var type = meta[c];
-                            blocks.AddEntity(new Block(type, new StationaryShape(new Vec2F(x, y), new Vec2F(0.0833333f, 0.0833333f)), legend[c]));
+                            blocks.AddEntity(new Block(type, new StationaryShape(new Vec2F(x / 12f, 1f - y / 25f), new Vec2F(1f / 12f, 1f / 25f)), legend[c]));
                         } else {
-                            blocks.AddEntity(new Block(BlockType.Standard, new StationaryShape(new Vec2F(x, y), new Vec2F(0.0833333f, 0.0833333f)), legend[c]));
+                            blocks.AddEntity(new Block(BlockType.Standard, new StationaryShape(new Vec2F(x / 12f, 1f - y / 25f), new Vec2F(1f / 12f, 1f / 25f)), legend[c]));
                         }
                     }
                 }
