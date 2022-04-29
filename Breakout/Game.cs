@@ -29,6 +29,7 @@ namespace Breakout {
 
         public override void Render() {
             player.Render();
+            map.RenderMap();
         }
 
         public override void Update() {

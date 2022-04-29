@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
-using Breakout.Block;
+using DIKUArcade.Entities;
+using DIKUArcade.Graphics;
 using DIKUArcade.Math;
 
 namespace Breakout {
@@ -39,44 +40,33 @@ namespace Breakout {
             }
 
             // parse legend
-            var legend = new Dictionary<char, string>();
+            var legend = new Dictionary<char, Image>();
             foreach (string line in legendString.TrimEnd('\n').Split("\n")) {
                 var left = line[0];
                 var right = line[3..];
-                legend[left] = right;
+                var image = new Image(Path.Combine("Assets", "Images", right));
+                legend[left] = image;
             }
 
             // parse map
-            var blocks = new List<IBlock>();
+            var blocks = new EntityContainer<Block>();
             int width = mapString.Split("\n").First().Length;
             int height = mapString.TrimEnd('\n').Split("\n").Length;
-            foreach (var (line, y) in mapString.Split("\n").Select((v, i) => (v, i))) {
-                foreach (var (c, x) in line.Select((v, i) => (v, i))) {
-                    Console.Write(c + ", ");
+            
+            foreach ((string line, float y) in mapString.Split("\n").Select((v, i) => (v, (float) i))) {
+                foreach ((char c, float x) in line.Select((v, i) => (v, (float) i))) {
                     if (legend.ContainsKey(c)) {
                         if (meta.ContainsKey(c)) {
                             var type = meta[c];
-                            switch (type) {
-                                case BlockType.Hardened:
-                                    blocks.Add(new Hardened(new Vec2I(x, y)));
-                                    break;
-                                case BlockType.PowerUp:
-                                    blocks.Add(new PowerUp(new Vec2I(x, y)));
-                                    break;
-                                case BlockType.Unbreakable:
-                                    blocks.Add(new Unbreakable(new Vec2I(x, y)));
-                                    break;
-                                default:
-                                    break;
-                            }
+                            blocks.AddEntity(new Block(type, new StationaryShape(new Vec2F(x, y), new Vec2F(0.0833333f, 0.0833333f)), legend[c]));
                         } else {
-                            blocks.Add(new Standard(new Vec2I(x, y)));
+                            blocks.AddEntity(new Block(BlockType.Standard, new StationaryShape(new Vec2F(x, y), new Vec2F(0.0833333f, 0.0833333f)), legend[c]));
                         }
                     }
                 }
             }
 
-            return new Map(name, timeLimit, width, height, blocks, legend);
+            return new Map(name, timeLimit, width, height, blocks);
         }
     }
 }
