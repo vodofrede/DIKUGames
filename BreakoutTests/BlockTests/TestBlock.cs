@@ -1,10 +1,10 @@
 using System.IO;
-using System.Linq.Expressions;
 using Breakout;
-using NUnit.Framework;
-using DIKUArcade;
 using DIKUArcade.Entities;
+using DIKUArcade.Graphics;
+using DIKUArcade.GUI;
 using DIKUArcade.Math;
+using NUnit.Framework;
 
 namespace BreakoutTests;
 
@@ -13,8 +13,10 @@ public class TestBlock {
 
     [SetUp]
     public void Setup() {
+        Window.CreateOpenGLContext();
+
         block = new Block(
-            BlockType.Standard, 
+            BlockType.Standard,
             new StationaryShape(new Vec2F(.4f, 0.4f), new Vec2F(0.1f, 0.1f)),
             new Image(Path.Combine("Assets", "Images", "green-block.png"))
         );
@@ -23,14 +25,15 @@ public class TestBlock {
     [Test]
     public void TestIsEntity() {
         // test satisfies R.1
-        Assert.True(typeof(Block).IsSubtypeOf(typeof(Entity)));
+        Assert.True(typeof(Block).IsSubclassOf(typeof(Entity)));
     }
 
     [Test]
     public void TestHasValueAndHealth() {
         // test satisfies R.2
-        Assert.True(block.GetHitpoints() != null);
-        Assert.True(block.GetValue() != null);
+        block.GetHitpoints();
+        block.GetValue();
+        Assert.Pass();
     }
 
     [Test]
