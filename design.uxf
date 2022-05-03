@@ -1,5 +1,5 @@
-<diagram program="umletino" version="14.4.0-SNAPSHOT"><zoom_level>10</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>441</x><y>357</y><w>230</w><h>200</h></coordinates><panel_attributes>&lt;&lt;Class&gt;&gt;
-Player
+<diagram program="umletino" version="14.4.0-SNAPSHOT"><zoom_level>10</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>423</x><y>357</y><w>230</w><h>200</h></coordinates><panel_attributes>&lt;&lt;Class&gt;&gt;
+Player : IGameEventProcessor
 --
 -entity: Entity
 -shape: DynamicShape
@@ -10,24 +10,27 @@ Player
 #SetMoveRight(bool val)
 #Move()
 #Render()
-#ProcessEvent(GameEvent gameEvent)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>161</x><y>347</y><w>210</w><h>100</h></coordinates><panel_attributes>&lt;&lt;Class&gt;&gt;
+#ProcessEvent(GameEvent gameEvent)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>143</x><y>347</y><w>210</w><h>100</h></coordinates><panel_attributes>&lt;&lt;Class&gt;&gt;
 Block
 --
 #GetHitpoints(): int
 #DecreaseHitpoints(): BlockEffect
 #GetPosition(): Vec2F
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>531</x><y>307</y><w>30</w><h>70</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;10;50</additional_attributes></element><element><id>UMLClass</id><coordinates><x>437</x><y>47</y><w>230</w><h>110</h></coordinates><panel_attributes>&lt;&lt;Class&gt;&gt;
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>513</x><y>317</y><w>30</w><h>60</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;10;40</additional_attributes></element><element><id>UMLClass</id><coordinates><x>419</x><y>47</y><w>230</w><h>110</h></coordinates><panel_attributes>&lt;&lt;Class&gt;&gt;
 FileLoader
 --
 #ParseFile(string filePath): Map
 #TryParseFile(string filePath): Map
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>357</x><y>267</y><w>100</w><h>30</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>80;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>527</x><y>147</y><w>30</w><h>70</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>437</x><y>197</y><w>230</w><h>120</h></coordinates><panel_attributes>&lt;&lt;Class&gt;&gt;
-Game
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>339</x><y>267</y><w>100</w><h>30</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>80;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>509</x><y>147</y><w>30</w><h>70</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>419</x><y>197</y><w>230</w><h>130</h></coordinates><panel_attributes>&lt;&lt;Class&gt;&gt;
+Game : IGameEventProcessor
 --
 -player: Player
 -currentMap: Map
 --
-#Update()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>157</x><y>127</y><w>210</w><h>170</h></coordinates><panel_attributes>&lt;&lt;Class&gt;&gt;
+#Render()
+#Update()
+#ProcessEvents()
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>139</x><y>127</y><w>210</w><h>170</h></coordinates><panel_attributes>&lt;&lt;Class&gt;&gt;
 Map
 --
 -name: String
@@ -38,9 +41,9 @@ Map
 -legend: HashMap&lt;String, String&gt;
 --
 #RenderMap()
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>257</x><y>287</y><w>30</w><h>80</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;10;60</additional_attributes></element><element><id>UMLClass</id><coordinates><x>157</x><y>507</y><w>210</w><h>90</h></coordinates><panel_attributes>&lt;&lt;Enum&gt;&gt;
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>239</x><y>287</y><w>30</w><h>80</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;10;60</additional_attributes></element><element><id>UMLClass</id><coordinates><x>139</x><y>507</y><w>210</w><h>90</h></coordinates><panel_attributes>&lt;&lt;Enum&gt;&gt;
 BlockEffect
 --
 None
 PowerUp
-Destroy</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>257</x><y>437</y><w>30</w><h>90</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;10;70</additional_attributes></element></diagram>
+Destroy</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>239</x><y>437</y><w>30</w><h>90</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;10;70</additional_attributes></element></diagram>
