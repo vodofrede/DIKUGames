@@ -1,10 +1,14 @@
+using DIKUArcade.Graphics;
 using DIKUArcade.Input;
+using DIKUArcade.Math;
 using DIKUArcade.State;
 
 namespace Breakout {
     public class GamePaused : IGameState {
 
-        private static GamePaused instance = null;
+        private static GamePaused? instance;
+
+        private Text endGameText;
 
         public GamePaused() {
             // endGameText

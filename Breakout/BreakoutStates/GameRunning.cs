@@ -15,7 +15,8 @@ namespace Breakout {
 
         // contained entities
         private Player player;
-        private EntityContainer<Block>;
+        private EntityContainer<Block> blocks;
+        private Ball ball;
 
         // images & animations
 
@@ -24,12 +25,15 @@ namespace Breakout {
 
         GameEventBus eventBus = BreakoutBus.GetBus();
 
-        private static GameRunning instance = null;
+        private static GameRunning? instance;
 
         public GameRunning() {
             // player setup
             player = new Player(new Image(Path.Combine("Assets", "Images", "player.png")));
             eventBus.Subscribe(GameEventType.PlayerEvent, player);
+
+            // ball
+            ball = new Ball(new Vec2F(0.5f, 0.05f));
 
             // points
             score = new Score(new Vec2F(0.5f, 0.5f), new Vec2F(0.2f, 0.2f));
@@ -39,6 +43,7 @@ namespace Breakout {
             endGameText.SetColor(new Vec3I(0, 128, 255));
 
             // winGameText
+
         }
 
         public static IGameState GetInstance() {
@@ -46,11 +51,13 @@ namespace Breakout {
         }
 
         public void RenderState() {
-
             score.RenderScore();
             if (gameOver) {
                 endGameText.RenderText();
             } else {
+                player.RenderEntity();
+                blocks.RenderEntities();
+                ball.RenderEntity();
                 // RENDER PLAYER
                 // RENDER BLOCKS
                 // RENDER BALL
@@ -63,17 +70,18 @@ namespace Breakout {
 
         public void UpdateState() {
             player.Move();
+            ball.Move();
         }
 
         // Detect Collisions
         // bool collision = CollisionDetection.Aabb(ball, block.Shape).Collision;
 
         // if (collision) {
-            // decrease hitpoints
-            
-            // if hitpoint <= 0 --> remove block and increase player score
+        // decrease hitpoints
+
+        // if hitpoint <= 0 --> remove block and increase player score
         // }
-    
+
         public void HandleKeyEvent(KeyboardAction keyboardAction, KeyboardKey keyboardKey) {
             switch (keyboardAction) {
                 case KeyboardAction.KeyPress:

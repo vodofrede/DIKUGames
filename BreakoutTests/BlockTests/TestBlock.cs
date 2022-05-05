@@ -9,7 +9,9 @@ using NUnit.Framework;
 namespace BreakoutTests;
 
 public class TestBlock {
+#pragma warning disable CS8618
     Block block;
+#pragma warning restore CS8618
 
     [SetUp]
     public void Setup() {

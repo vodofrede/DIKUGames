@@ -1,7 +1,7 @@
 using DIKUArcade.Events;
 using DIKUArcade.State;
 
-namespace Breakout {
+namespace Breakout.BreakoutStates {
 
     public class StateMachine : IGameEventProcessor {
 
@@ -10,9 +10,13 @@ namespace Breakout {
         public StateMachine() {
             BreakoutBus.GetBus().Subscribe(GameEventType.GameStateEvent, this);
             BreakoutBus.GetBus().Subscribe(GameEventType.InputEvent, this);
-            SwitchState(GameStateType.MainMenu);
             _ = GameRunning.GetInstance();
             _ = GamePaused.GetInstance();
+
+
+            // følgende statement forhindrer en lint warning
+            ActiveState = MainMenu.GetInstance();
+            // SwitchState(GameStateType.MainMenu);
         }
 
         public void ProcessEvent(GameEvent gameEvent) {
