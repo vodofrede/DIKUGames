@@ -1,3 +1,4 @@
+using Breakout.BreakoutStates;
 using DIKUArcade;
 using DIKUArcade.Entities;
 using DIKUArcade.Events;
@@ -9,23 +10,19 @@ using DIKUArcade.Math;
 namespace Breakout {
 
     public class Game : DIKUGame, IGameEventProcessor {
-        private Player player;
-        private Map map;
+        private StateMachine stateMachine;
 
         public Game(WindowArgs windowArgs) : base(windowArgs) {
+            stateMachine = new StateMachine();
+
             // event bus
             GameEventBus eventBus = BreakoutBus.GetBus();
-            eventBus.InitializeEventBus(new List<GameEventType> { GameEventType.InputEvent, GameEventType.PlayerEvent, GameEventType.WindowEvent });
-            // player setup
-            player = new Player(new Image(Path.Combine("Assets", "Images", "player.png")));
-            eventBus.Subscribe(GameEventType.PlayerEvent, player);
-            eventBus.Subscribe(GameEventType.InputEvent, this);
+            eventBus.InitializeEventBus(new List<GameEventType> { GameEventType.InputEvent, GameEventType.PlayerEvent, GameEventType.WindowEvent, GameEventType.GameStateEvent });
             eventBus.Subscribe(GameEventType.WindowEvent, this);
+            eventBus.Subscribe(GameEventType.GameStateEvent, stateMachine);
 
-            // load map
-            map = FileLoader.TryParseFile(Path.Combine("Assets", "Levels", "level2.txt"));
-
-            window.SetKeyEventHandler(HandleKeyEvent);
+            // key input forwarding
+            window.SetKeyEventHandler(KeyHandler);
         }
 
         public void ProcessEvent(GameEvent gameEvent) {
@@ -40,78 +37,19 @@ namespace Breakout {
             }
         }
 
+        private void KeyHandler(KeyboardAction action, KeyboardKey key) {
+            stateMachine.ActiveState.HandleKeyEvent(action, key);
+        }
+
         public override void Render() {
             window.Clear();
-            player.RenderEntity();
-            map.RenderMap();
+            stateMachine.ActiveState.RenderState();
         }
 
         public override void Update() {
-            player.Move();
             window.PollEvents();
             BreakoutBus.GetBus().ProcessEventsSequentially();
-        } 
-
-        public void HandleKeyEvent(KeyboardAction keyboardAction, KeyboardKey keyboardKey) {
-            switch (keyboardAction) {
-                case KeyboardAction.KeyPress:
-                    KeyPress(keyboardKey);
-                    break;
-                case KeyboardAction.KeyRelease:
-                    KeyRelease(keyboardKey);
-                    break;
-            }
-        }
-
-        public void KeyPress(KeyboardKey key) {
-            switch (key) {
-                case KeyboardKey.Right:
-                    BreakoutBus.GetBus().RegisterEvent(new GameEvent {
-                        EventType = GameEventType.PlayerEvent,
-                        From = this,
-                        To = player,
-                        Message = "START_MOVE_RIGHT"
-                    });
-                    break;
-                case KeyboardKey.Left:
-                    BreakoutBus.GetBus().RegisterEvent(new GameEvent {
-                        EventType = GameEventType.PlayerEvent,
-                        From = this,
-                        To = player,
-                        Message = "START_MOVE_LEFT"
-                    });
-                    break;
-            }
-        }
-
-        public void KeyRelease(KeyboardKey key) {
-            switch (key) {
-                case KeyboardKey.Right:
-                    BreakoutBus.GetBus().RegisterEvent(new GameEvent {
-                        EventType = GameEventType.PlayerEvent,
-                        From = this,
-                        To = player,
-                        Message = "STOP_MOVE_RIGHT"
-                    });
-                    break;
-
-                case KeyboardKey.Left:
-                    BreakoutBus.GetBus().RegisterEvent(new GameEvent {
-                        EventType = GameEventType.PlayerEvent,
-                        From = this,
-                        To = player,
-                        Message = "STOP_MOVE_LEFT"
-                    });
-                    break;
-
-                case KeyboardKey.Escape:
-                    BreakoutBus.GetBus().RegisterEvent(new GameEvent {
-                        EventType = GameEventType.WindowEvent,
-                        From = this,
-                        Message = "CLOSE_WINDOW"
-                    });
-                    break;
-            }
+            stateMachine.ActiveState.UpdateState();
         }
     }
 }

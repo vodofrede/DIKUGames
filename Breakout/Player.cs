@@ -10,7 +10,7 @@ namespace Breakout {
         private float moveRight;
         private const float MOVEMENT_SPEED = 0.035f;
 
-        public Player(IBaseImage image): base(new DynamicShape(new Vec2F(0.45f, 0.1f), new Vec2F(0.1f, 0.02f)), image) {}
+        public Player(IBaseImage image) : base(new DynamicShape(new Vec2F(0.45f, 0.1f), new Vec2F(0.2f, 0.02f)), image) { }
 
         public void ProcessEvent(GameEvent gameEvent) {
 

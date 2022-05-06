@@ -14,8 +14,8 @@ namespace Breakout {
             display.SetColor(new Vec3I(0, 128, 255));
         }
 
-        public void AddPoints() {
-            Points++;
+        public void AddPoints(int value) {
+            Points += value;
             display.SetText(string.Format("Score: " + Points.ToString()));
         }
 

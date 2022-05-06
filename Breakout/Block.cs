@@ -9,7 +9,7 @@ namespace Breakout {
     }
 
     public enum BlockType {
-        Hardened, 
+        Hardened,
         PowerUp,
         Unbreakable,
         Standard,
@@ -17,32 +17,32 @@ namespace Breakout {
 
     public class Block : Entity {
         private int hitpoints;
-        private int value {get;}
-        private BlockType type {get;}
+        public int Value { get; private set; }
+        public BlockType Type { get; }
 
-        public Block(BlockType type, Shape shape, IBaseImage image): base(shape, image) {
+        public Block(BlockType type, Shape shape, IBaseImage image) : base(shape, image) {
             switch (type) {
                 case BlockType.Standard:
                     hitpoints = 1;
-                    value = 1;
+                    Value = 1;
                     break;
                 case BlockType.Hardened:
                     hitpoints = 2;
-                    value = 2;
+                    Value = 2;
                     break;
                 case BlockType.PowerUp:
                     hitpoints = 1;
-                    value = 3;
+                    Value = 3;
                     break;
                 case BlockType.Unbreakable:
                     hitpoints = 1;
-                    value = 4;
+                    Value = 4;
                     break;
             }
         }
 
         public BlockEffect DecreaseHitpoints() {
-            switch (type) {
+            switch (Type) {
                 case BlockType.Standard:
                     hitpoints = Math.Max(hitpoints - 1, 0);
                     return BlockEffect.Destroy;
@@ -65,10 +65,6 @@ namespace Breakout {
 
         public int GetHitpoints() {
             return hitpoints;
-        }
-
-        public int GetValue() {
-            return value;
         }
     }
 }

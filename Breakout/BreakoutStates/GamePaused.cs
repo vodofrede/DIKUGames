@@ -20,11 +20,10 @@ namespace Breakout {
             return instance ?? (instance = new GamePaused());
         }
 
-
         public void RenderState() {
             // render background image
             // render menu buttons
-            // new game & quit
+            // continue or quit
         }
 
         public void ResetState() {

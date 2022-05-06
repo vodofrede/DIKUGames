@@ -20,31 +20,27 @@ namespace Breakout.BreakoutStates {
         }
 
         public void ProcessEvent(GameEvent gameEvent) {
-
             switch (gameEvent.EventType) {
                 case GameEventType.GameStateEvent:
-                    if (gameEvent.StringArg1 == "GAME_RUNNING") {
-                        SwitchState(GameStateType.GameRunning);
+                    switch (gameEvent.Message) {
+                        case "GAME_RUNNING":
+                            SwitchState(GameStateType.GameRunning);
+                            break;
+                        case "MAIN_MENU":
+                            SwitchState(GameStateType.MainMenu);
+                            break;
+                        case "GAME_PAUSED":
+                            SwitchState(GameStateType.GamePaused);
+                            break;
                     }
-
-                    if (gameEvent.StringArg1 == "MAIN_MENU") {
-                        SwitchState(GameStateType.MainMenu);
-                    }
-
-                    if (gameEvent.StringArg1 == "GAME_PAUSED") {
-                        SwitchState(GameStateType.GamePaused);
-                    }
-
                     break;
-
                 case GameEventType.InputEvent:
                     if (gameEvent.Message == "CLOSE_WINDOW") {
                         BreakoutBus.GetBus().RegisterEvent(
                             new GameEvent {
                                 EventType = GameEventType.GameStateEvent,
                                 From = this,
-                                Message = "CHANGE_STATE",
-                                StringArg1 = "CLOSE_WINDOW"
+                                Message = "CLOSE_WINDOW"
                             }
                         );
                     }
