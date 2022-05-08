@@ -12,7 +12,11 @@ namespace Breakout {
 
         // constants
         private const int LIVES = 3;
-        private const float SPEEDINCREASE = 0.0003f;
+        private const float SPEEDINCREASE = 0.003f;
+        private const float MAXIMUM_ANGLE = (5*MathF.PI)/12;
+
+
+        private float BALLSPEED = 0.01f;
 
         // state
         private Score score;
@@ -102,50 +106,31 @@ namespace Breakout {
 
                 var playerCollision = CollisionDetection.Aabb(dynamicBall, player.Shape);
                 if (playerCollision.Collision) {
-                    ball.Velocity.Y = -ball.Velocity.Y;
-                    double ballLength = ball.Velocity.Length();
+                    
+                    // finding middle of player shape
+                    float playerMiddleX = player.Shape.Position.X + player.Shape.Extent.X / 2f;
+                    // subtracting balls position to find relative impact (where on the player it hits)
+                    // this value is -+ extent / 2 (in our case from -0.1f to 0.1f)
+                    float relativeImpactPosition = playerMiddleX - dynamicBall.Position.X;
+                    // normalizing to get value from -1 to 1
+                    float normalizedRelativeImpact = relativeImpactPosition * 10;
+                    // calculating angle based on relative impact and max angle
+                    float bounceAngle = normalizedRelativeImpact * MAXIMUM_ANGLE;
 
-                    float playerLeftToImpact = dynamicBall.Position.X - player.Shape.Position.X;
+                    // setting new x,y velocity
+                    ball.Velocity.Y = BALLSPEED * MathF.Cos(bounceAngle);
+                    ball.Velocity.X = BALLSPEED * -MathF.Sin(bounceAngle);                    
 
-                    // float playerMiddleX = player.Shape.Position.X + player.Shape.Extent.X / 2f;
-                    // float relativeImpactPosition = playerLeftToImpact / player.Shape.Extent.X;
-                    // Console.WriteLine("playerLeftToImpact: " + playerLeftToImpact);
-                    // Console.WriteLine("relativeImpactPosition: " + relativeImpactPosition);
-                    // Console.WriteLine("player.Position.X: " + player.Shape.Position.X);
-                    // Console.WriteLine("player.Shape.Extent.X / 2f: " + player.Shape.Extent.X / 2f);
-
-                    // collision on left side of player
-                    if (playerLeftToImpact < player.Shape.Extent.X / 2f) {
-                        // ball coming right to left (mod venstre)
-                        if (ball.Velocity.X < 0.0f) {
-                            ball.Velocity.X = ball.Velocity.X / playerLeftToImpact;
-                            ball.Velocity.Y = ball.Velocity.Y / 2f;
-                        }
-                        // ball coming left to right
-                        else if (ball.Velocity.X >= 0.0f) {
-                            ball.Velocity.X = -ball.Velocity.X / 1 - playerLeftToImpact;
-                            ball.Velocity.Y = ball.Velocity.Y / 2f;
-                        }
-                    }
-                    // collision on right side of player
-                    else if (playerLeftToImpact > player.Shape.Extent.X / 2f) {
-                        // ball coming right to left (mod venstre)
-                        if (ball.Velocity.X < 0.0f) {
-                            ball.Velocity.X = -ball.Velocity.X * 2f;
-                            ball.Velocity.Y = ball.Velocity.Y / 2f;
-                        }
-                        // ball coming left to right
-                        else if (ball.Velocity.X >= 0.0f) {
-                            ball.Velocity.X = ball.Velocity.X * 2f;
-                            ball.Velocity.Y = ball.Velocity.Y / 2f;
-                        }
-                    }
                 }
 
                 map.GetBlocks().Iterate(block => {
                     var blockCollision = CollisionDetection.Aabb(dynamicBall, block.Shape);
 
                     if (blockCollision.Collision) {
+                        if (score.Points != 0 && score.Points % 10 == 0) {
+                            BALLSPEED += speedIncrease;
+                        }
+
                         var effect = block.DecreaseHitpoints();
                         if (effect == BlockEffect.Destroy) {
                             block.DeleteEntity();
