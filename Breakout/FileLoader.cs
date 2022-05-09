@@ -61,19 +61,18 @@ namespace Breakout {
                 } else if (line.StartsWith("Hardened")) {
                     meta[line[10]] = BlockType.Hardened;
                 } else if (line.StartsWith("PowerUp")) {
-                    meta[line[9]] = BlockType.PowerUp;
+                    meta[line[9]] = BlockType.Hungry;
                 } else if (line.StartsWith("Unbreakable")) {
                     meta[line[12]] = BlockType.Unbreakable;
                 }
             }
 
             // parse legend
-            var legend = new Dictionary<char, Image>();
+            var legend = new Dictionary<char, string>();
             foreach (string line in legendString.TrimEnd('\n').Split("\n")) {
                 var left = line[0];
                 var right = line[3..];
-                var image = new Image(Path.Combine("Assets", "Images", right));
-                legend[left] = image;
+                legend[left] = right;
             }
 
             // parse map
@@ -84,9 +83,9 @@ namespace Breakout {
                     if (legend.ContainsKey(c)) {
                         if (meta.ContainsKey(c)) {
                             var type = meta[c];
-                            blocks.AddEntity(new Block(type, new StationaryShape(new Vec2F(x / 12f, 1f - y / 25f), new Vec2F(1f / 12f, 1f / 25f)), legend[c]));
+                            blocks.AddEntity(new Block(type, new Vec2F(x, y), legend[c]));
                         } else {
-                            blocks.AddEntity(new Block(BlockType.Standard, new StationaryShape(new Vec2F(x / 12f, 1f - y / 25f), new Vec2F(1f / 12f, 1f / 25f)), legend[c]));
+                            blocks.AddEntity(new Block(BlockType.Standard, new Vec2F(x, y), legend[c]));
                         }
                     }
                 }

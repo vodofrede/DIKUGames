@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Breakout;
 using DIKUArcade.Entities;
@@ -19,8 +20,8 @@ public class TestBlock {
 
         block = new Block(
             BlockType.Standard,
-            new StationaryShape(new Vec2F(.4f, 0.4f), new Vec2F(0.1f, 0.1f)),
-            new Image(Path.Combine("Assets", "Images", "green-block.png"))
+            new Vec2F(0.5f, 0.5f),
+            new Image(Path.Combine("Assets", "Images", "red-block.png"))
         );
     }
 
@@ -33,23 +34,23 @@ public class TestBlock {
     [Test]
     public void TestHasValueAndHealth() {
         // test satisfies R.2
-        block.GetHitpoints();
-        block.GetValue();
+        Console.WriteLine(block.Hitpoints);
+        Console.WriteLine(block.Value);
         Assert.Pass();
     }
 
     [Test]
     public void TestHealthDecrement() {
         // test satisfies R.5
-        Assert.AreEqual(1, block.GetHitpoints());
+        Assert.AreEqual(1, block.Hitpoints);
         block.DecreaseHitpoints();
-        Assert.AreEqual(0, block.GetHitpoints());
+        Assert.AreEqual(0, block.Hitpoints);
     }
 
     [Test]
     public void TestDestroyBlock() {
         // test satisfies R.6
-        Assert.AreEqual(1, block.GetHitpoints());
+        Assert.AreEqual(1, block.Hitpoints);
         Assert.AreEqual(BlockEffect.Destroy, block.DecreaseHitpoints());
     }
 }

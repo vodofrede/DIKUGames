@@ -13,7 +13,7 @@ namespace Breakout {
         // constants
         private const int LIVES = 3;
         private const float SPEEDINCREASE = 0.003f;
-        private const float MAXIMUM_ANGLE = (5*MathF.PI)/12;
+        private const float MAXIMUM_ANGLE = (5 * MathF.PI) / 12;
 
 
         private float BALLSPEED = 0.01f;
@@ -95,6 +95,7 @@ namespace Breakout {
                 });
             } else {
                 // game is running
+                map.GetBlocks().Iterate(block => block.Update());
                 player.Move();
                 if (ball.Move()) {
                     ball = new Ball(new Vec2F(0.5f, 0.05f));
@@ -106,7 +107,7 @@ namespace Breakout {
 
                 var playerCollision = CollisionDetection.Aabb(dynamicBall, player.Shape);
                 if (playerCollision.Collision) {
-                    
+
                     // finding middle of player shape
                     float playerMiddleX = player.Shape.Position.X + player.Shape.Extent.X / 2f;
                     // subtracting balls position to find relative impact (where on the player it hits)
@@ -119,7 +120,7 @@ namespace Breakout {
 
                     // setting new x,y velocity
                     ball.Velocity.Y = BALLSPEED * MathF.Cos(bounceAngle);
-                    ball.Velocity.X = BALLSPEED * -MathF.Sin(bounceAngle);                    
+                    ball.Velocity.X = BALLSPEED * -MathF.Sin(bounceAngle);
 
                 }
 
@@ -132,9 +133,25 @@ namespace Breakout {
                         }
 
                         var effect = block.DecreaseHitpoints();
-                        if (effect == BlockEffect.Destroy) {
-                            block.DeleteEntity();
-                            score.AddPoints(block.Value);
+                        switch (effect) {
+                            case BlockEffect.Destroy:
+                                block.DeleteEntity();
+                                score.AddPoints(block.Value);
+                                break;
+                            case BlockEffect.Hungry:
+                                ball = new Ball(new Vec2F(0.5f, 0.05f));
+                                block.DeleteEntity();
+                                score.AddPoints(block.Value);
+                                break;
+                            case BlockEffect.Reveal:
+                                map.GetBlocks().Iterate(block => {
+                                    if (block.Type == BlockType.Invisible) {
+                                        block.SwapImage();
+                                    }
+                                });
+                                break;
+                            default:
+                                throw new NotImplementedException();
                         }
 
                         switch (blockCollision.CollisionDir) {
@@ -163,7 +180,7 @@ namespace Breakout {
         // bool collision = CollisionDetection.Aabb(ball, block.Shape).Collision;
 
         // if (collision) {
-        // decrease hitpoints
+        // decrease Hitpoints
 
         // if hitpoint <= 0 --> remove block and increase player score
         // }
