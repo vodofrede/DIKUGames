@@ -8,24 +8,15 @@ using DIKUArcade.State;
 
 namespace Breakout {
     public class GameRunning : IGameState {
-        /// <summary>
-        /// The singleton instance of GameRunning
-        /// </summary>
         private static GameRunning? instance;
 
         // constants
-        /// <summary>
-        /// Constants defined at the top of the file to avoid magic numbers
-        /// </summary>
         private const int LIVES = 3;
         private const float SPEEDINCREASE = 0.003f;
         private const float MAXIMUM_ANGLE = 5 * MathF.PI / 12;
         private const float INITIAL_BALLSPEED = 0.01f;
 
         // state
-        /// <summary>
-        /// GameRunning variables
-        /// </summary>
         private Score score;
         private int lives = LIVES;
         private float speedIncrease = SPEEDINCREASE;
@@ -33,16 +24,10 @@ namespace Breakout {
         private Text livesLeftText;
 
         // contained entities
-        /// <summary>
-        /// GameRunning entities
-        /// </summary>
         private Player player;
         private Map? map;
         private Ball ball;
 
-        /// <summary>
-        /// Singleton instances for convenience
-        /// </summary>
         private GameEventBus eventBus = BreakoutBus.GetBus();
         private FileLoader fileLoader = FileLoader.GetInstance();
 
@@ -61,10 +46,16 @@ namespace Breakout {
             livesLeftText.SetColor(new Vec3I(0, 128, 255));
         }
 
+        /// <summary>
+        /// Get the singleton instance
+        /// </summary>
         public static IGameState GetInstance() {
             return instance ??= new GameRunning();
         }
 
+        /// <summary>
+        /// Render State 
+        /// </summary>
         public void RenderState() {
             player.RenderEntity();
             map?.RenderMap();
@@ -73,6 +64,10 @@ namespace Breakout {
             livesLeftText.RenderText();
         }
 
+
+        /// <summary>
+        /// Reset State
+        /// </summary>
         public void ResetState() {
             player = new Player(new Image(Path.Combine("Assets", "Images", "player.png")));
             eventBus.Subscribe(GameEventType.PlayerEvent, player);
@@ -84,6 +79,9 @@ namespace Breakout {
             livesLeftText.SetText("Lives left: " + lives);
         }
 
+        /// <summary>
+        /// Update State
+        /// </summary>
         public void UpdateState() {
             if (lives > 0 && map == null) {
                 // entire game is won
@@ -187,6 +185,9 @@ namespace Breakout {
             }
         }
 
+        /// <summary>
+        /// Handle Key Events
+        /// </summary>
         public void HandleKeyEvent(KeyboardAction keyboardAction, KeyboardKey keyboardKey) {
             switch (keyboardAction) {
                 case KeyboardAction.KeyPress:
@@ -198,6 +199,9 @@ namespace Breakout {
             }
         }
 
+        /// <summary>
+        /// Handle Key Presses
+        /// </summary>
         public void KeyPress(KeyboardKey key) {
             switch (key) {
                 case KeyboardKey.Right:
@@ -219,6 +223,9 @@ namespace Breakout {
             }
         }
 
+        /// <summary>
+        /// Handle Key Releases
+        /// </summary>
         public void KeyRelease(KeyboardKey key) {
             switch (key) {
                 case KeyboardKey.Space:

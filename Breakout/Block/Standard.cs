@@ -20,19 +20,31 @@ namespace Breakout.Block {
             Type = "Block";
         }
 
+        /// <summary>
+        /// Decrease hitpoints and return an effect
+        /// </summary>
         public virtual string DecreaseHitpoints() {
             Hitpoints = Math.Max(Hitpoints - 1, 0);
             return NoMoreHitpoints() ? "Destroy" : "None";
         }
 
+        /// <summary>
+        /// Update the block
+        /// </summary>
         public virtual void Update() {
             
         }
 
+        /// <summary>
+        /// Check if the block has more hitpoints
+        /// </summary>
         protected virtual bool NoMoreHitpoints() {
             return Hitpoints <= 0;
         }
 
+        /// <summary>
+        /// Swap the image of the block
+        /// </summary>
         public void SwapImage() {
             if (altImage != null) {
                 Image = altImage;

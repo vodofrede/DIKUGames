@@ -20,10 +20,16 @@ namespace Breakout.BreakoutStates {
         };
         private int activeMenuButton;
 
+        /// <summary>
+        /// Get the singleton instance
+        /// </summary>
         public static IGameState GetInstance() {
             return instance ?? (instance = new MainMenu());
         }
 
+        /// <summary>
+        /// Render the State
+        /// </summary>
         public void RenderState() {
             // render background image
             backGroundImage.RenderEntity();
@@ -43,10 +49,16 @@ namespace Breakout.BreakoutStates {
         }
 
 
+        /// <summary>
+        /// Reset the State
+        /// </summary>
         public void ResetState() {
 
         }
 
+        /// <summary>
+        /// Update the State
+        /// </summary>
         public void UpdateState() {
             for (int i = 0; i < menuButtons.Length; i++) {
                 menuButtons[i].SetFontSize(3000);
@@ -62,6 +74,9 @@ namespace Breakout.BreakoutStates {
 
         }
 
+        /// <summary>
+        /// Handle Key Events
+        /// </summary>
         public void HandleKeyEvent(KeyboardAction action, KeyboardKey key) {
             switch (action) {
                 case KeyboardAction.KeyPress:
@@ -74,6 +89,9 @@ namespace Breakout.BreakoutStates {
             }
         }
 
+        /// <summary>
+        /// Key Press Handler
+        /// </summary>
         public void KeyPress(KeyboardKey keyboardKey) {
             switch (keyboardKey) {
                 case KeyboardKey.Escape:

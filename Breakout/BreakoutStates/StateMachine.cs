@@ -19,6 +19,9 @@ namespace Breakout.BreakoutStates {
             // SwitchState(GameStateType.MainMenu);
         }
 
+        /// <summary>
+        /// Process incoming events
+        /// </summary>
         public void ProcessEvent(GameEvent gameEvent) {
             switch (gameEvent.EventType) {
                 case GameEventType.GameStateEvent:
@@ -50,6 +53,9 @@ namespace Breakout.BreakoutStates {
             }
         }
 
+        /// <summary>
+        /// Switch the state of the state machine
+        /// </summary>
         private void SwitchState(GameStateType stateType) {
             switch (stateType) {
                 case GameStateType.MainMenu:

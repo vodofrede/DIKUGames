@@ -9,6 +9,9 @@ namespace Breakout {
 
 
     public class StateTransformer {
+        /// <summary>
+        /// Transform a string to a game state
+        /// </summary>
         public static GameStateType TransformStringToState(string state) {
             return state switch {
                 "GAME_RUNNING" => GameStateType.GameRunning,
@@ -18,6 +21,9 @@ namespace Breakout {
             };
         }
 
+        /// <summary>
+        /// Transform game state to a string representation
+        /// </summary>
         public static string TransformStateToString(GameStateType state) {
             return state switch {
                 GameStateType.GameRunning => "GAME_RUNNING",

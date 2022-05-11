@@ -23,12 +23,18 @@ namespace Breakout {
         }
 
         // methods
+        /// <summary>
+        /// Get the next map in the list of maps
+        /// </summary>
         public Map? NextMap() {
             var map = mapIndex < maps.Length ? ParseFile(maps[mapIndex]) : null;
             mapIndex++;;
             return map;
         }
 
+        /// <summary>
+        /// Reset the map index
+        /// </summary>
         public void ResetMaps() {
             mapIndex = 0;
         }
@@ -38,6 +44,9 @@ namespace Breakout {
         private static string legendPattern = @"(Legend:\n)((.*\n)*)(Legend\/)";
 
         // static methods
+        /// <summary>
+        /// Parse a path into a map
+        /// </summary>
         public static Map ParseFile(string filePath) {
             string file = File.ReadAllText(filePath);
             string normalized = Regex.Replace(file, @"\r\n|\n\r|\n|\r", "\n");
@@ -104,6 +113,9 @@ namespace Breakout {
             return new Map(name, timeLimit, blocks);
         }
 
+        /// <summary>
+        /// Catch any errors from parsing a map file
+        /// </summary>
         public static Map TryParseFile(string file) {
             Map map;
             try {

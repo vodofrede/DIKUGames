@@ -29,7 +29,9 @@ namespace Breakout {
             Velocity = new Vec2F(SPEED, SPEED);
         }
 
-        // methods
+        /// <summary>
+        /// Move the block in bounds
+        /// </summary>
         public bool Move() {
             // bounce off the walls if position will be out of bounds
             float newX = Shape.Position.X + Velocity.X;

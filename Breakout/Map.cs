@@ -15,14 +15,23 @@ namespace Breakout {
             this.blocks = blocks;
         }
 
+        /// <summary>
+        /// Render the current map
+        /// </summary>
         public void RenderMap() {
             blocks.RenderEntities();
         }
 
+        /// <summary>
+        /// Get all blocks as an entitycontainer
+        /// </summary>
         public EntityContainer<Standard> GetBlocks() {
             return blocks;
         }
 
+        /// <summary>
+        /// Get the name of the map
+        /// </summary>
         public string GetName() {
             return name;
         }

@@ -10,6 +10,9 @@ namespace Breakout.Block {
             Type = "Unbreakable";
         }
 
+        /// <summary>
+        /// Decrease hitpoints and return an effect
+        /// </summary>
         public override string DecreaseHitpoints() {
             return "None";
         }
