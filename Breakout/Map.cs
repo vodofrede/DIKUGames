@@ -1,3 +1,4 @@
+using Breakout.Block;
 using DIKUArcade.Entities;
 using DIKUArcade.Math;
 
@@ -6,9 +7,9 @@ namespace Breakout {
         private string name {get;}
         private int timeLimit {get;}
 
-        private EntityContainer<Block> blocks { get; }
+        private EntityContainer<Standard> blocks { get; }
         
-        public Map(string name, int timeLimit, EntityContainer<Block> blocks) {
+        public Map(string name, int timeLimit, EntityContainer<Standard> blocks) {
             this.name = name;
             this.timeLimit = timeLimit;
             this.blocks = blocks;
@@ -18,7 +19,7 @@ namespace Breakout {
             blocks.RenderEntities();
         }
 
-        public EntityContainer<Block> GetBlocks() {
+        public EntityContainer<Standard> GetBlocks() {
             return blocks;
         }
 

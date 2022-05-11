@@ -3,7 +3,7 @@ using DIKUArcade.Graphics;
 using DIKUArcade.Math;
 
 namespace Breakout.Block {
-    public class Block : Entity {
+    public class Standard : Entity {
         protected const float HORIZONTALBLOCKS = 12f;
         protected const float VERTICALBLOCKS = 25f;
 
@@ -14,7 +14,7 @@ namespace Breakout.Block {
         // special block fields that may be null
         protected IBaseImage? altImage;
 
-        public Block(Vec2F pos, string imageName) : base(new StationaryShape(new Vec2F(pos.X / HORIZONTALBLOCKS, 1f - pos.Y / VERTICALBLOCKS), new Vec2F(1f / 12f, 1f / 25f)), new Image(Path.Combine("Assets", "Images", imageName))) {
+        public Standard(Vec2F pos, string imageName) : base(new StationaryShape(new Vec2F(pos.X / HORIZONTALBLOCKS, 1f - pos.Y / VERTICALBLOCKS), new Vec2F(1f / 12f, 1f / 25f)), new Image(Path.Combine("Assets", "Images", imageName))) {
             Hitpoints = 1;
             Value = 1;
             Type = "Block";

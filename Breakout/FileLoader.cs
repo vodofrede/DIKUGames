@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Breakout.Block;
 using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 using DIKUArcade.Math;
@@ -52,18 +53,18 @@ namespace Breakout {
             // parse meta
             string name = "placeholder";
             int timeLimit = 0;
-            var meta = new Dictionary<char, BlockType>();
+            var meta = new Dictionary<char, string>();
             foreach (string line in metaString.Split("\n")) {
                 if (line.StartsWith("Name")) {
                     name = line[6..];
                 } else if (line.StartsWith("Time")) {
                     timeLimit = int.Parse(line[6..]);
                 } else if (line.StartsWith("Hardened")) {
-                    meta[line[10]] = BlockType.Hardened;
+                    meta[line[10]] = "Hardened";
                 } else if (line.StartsWith("PowerUp")) {
-                    meta[line[9]] = BlockType.Hungry;
+                    meta[line[9]] = "PowerUp";
                 } else if (line.StartsWith("Unbreakable")) {
-                    meta[line[12]] = BlockType.Unbreakable;
+                    meta[line[12]] = "Unbreakable";
                 }
             }
 
@@ -76,15 +77,25 @@ namespace Breakout {
             }
 
             // parse map
-            var blocks = new EntityContainer<Block>();
+            var blocks = new EntityContainer<Standard>();
             foreach ((string line, float y) in mapString.Split("\n").Select((v, i) => (v, (float)i))) {
                 foreach ((char c, float x) in line.Select((v, i) => (v, (float)i))) {
                     if (legend.ContainsKey(c)) {
                         if (meta.ContainsKey(c)) {
                             var type = meta[c];
-                            blocks.AddEntity(new Block(type, new Vec2F(x, y), legend[c]));
+                            switch (type) {
+                                case "Hardened":
+                                    blocks.AddEntity(new Hardened(new Vec2F(x, y), legend[c]));
+                                    break;
+                                case "PowerUp":
+                                    blocks.AddEntity(new Hungry(new Vec2F(x, y), legend[c]));
+                                    break;
+                                case "Unbreakable":
+                                    blocks.AddEntity(new Unbreakable(new Vec2F(x, y), legend[c]));
+                                    break;
+                            }
                         } else {
-                            blocks.AddEntity(new Block(BlockType.Standard, new Vec2F(x, y), legend[c]));
+                            blocks.AddEntity(new Standard(new Vec2F(x, y), legend[c]));
                         }
                     }
                 }
