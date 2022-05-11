@@ -3,7 +3,7 @@ using DIKUArcade.Graphics;
 using DIKUArcade.Math;
 
 namespace Breakout.Block {
-    public class Hardened : Block {
+    public class Hardened : Standard {
         public Hardened(Vec2F pos, string imageName) : base(pos, imageName) {
             string altImageName = imageName.Insert(imageName.Length - 3, "-damaged");
             Console.WriteLine("alt Image Name: " + altImageName);

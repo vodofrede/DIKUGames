@@ -67,6 +67,16 @@ namespace Breakout {
             // continue or quit
         }
 
+        /// <summary>
+        /// Reset the Game State
+        /// </summary>
+        public void ResetState() {
+
+        }
+
+        /// <summary>
+        /// Update the Game State
+        /// </summary>
         public void UpdateState() {
             for (int i = 0; i < menuButtons.Length; i++) {
                 if (i == activeMenuButton) {
@@ -79,6 +89,9 @@ namespace Breakout {
             }
         }
 
+        /// <summary>
+        /// Key Event Handler
+        /// </summary>
         public void HandleKeyEvent(KeyboardAction keyboardAction, KeyboardKey keyboardKey) {
             switch (keyboardAction) {
                 case KeyboardAction.KeyPress:
@@ -91,6 +104,9 @@ namespace Breakout {
             }
         }
 
+        /// <summary>
+        /// Key Press Handler
+        /// </summary>
         public void KeyPress(KeyboardKey keyboardKey) {
             switch (keyboardKey) {
                 case KeyboardKey.Escape:
