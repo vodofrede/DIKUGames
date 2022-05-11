@@ -29,10 +29,6 @@ namespace Breakout {
             Velocity = new Vec2F(SPEED, SPEED);
         }
 
-        public Ball(Vec2F position, IBaseImage image) : base(new DynamicShape(position, new Vec2F(DIAMETER, DIAMETER)), image) {
-            Velocity = new Vec2F(SPEED, SPEED);
-        }
-
         // methods
         public bool Move() {
             // bounce off the walls if position will be out of bounds
@@ -50,9 +46,6 @@ namespace Breakout {
             // move ball
             Shape.Position.X += Velocity.X;
             Shape.Position.Y += Velocity.Y;
-
-            // Console.Write("X: " + Shape.Position.X.ToString("n2") + ", ");
-            // Console.WriteLine("Y: " + Shape.Position.Y.ToString("n2"));
 
             // return a boolean of whether the top of the ball moved off the bottom of the screen
             return Shape.Position.Y + Radius <= 0.0f;

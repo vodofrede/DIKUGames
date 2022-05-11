@@ -21,7 +21,7 @@ public class TestBlock {
         block = new Block(
             BlockType.Standard,
             new Vec2F(0.5f, 0.5f),
-            new Image(Path.Combine("Assets", "Images", "red-block.png"))
+            "red-block.png"
         );
     }
 

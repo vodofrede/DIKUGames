@@ -27,13 +27,6 @@ namespace Breakout {
 
         public void ProcessEvent(GameEvent gameEvent) {
             switch (gameEvent.EventType) {
-                // case GameEventType.GameStateEvent:
-                //     switch(gameEvent.Message) {
-                //         case "PAUSE_GAME":
-                //             // stateMachine.ActiveState == 
-                //             break;
-                //     }
-                //     break;
                 case GameEventType.WindowEvent:
                     switch (gameEvent.Message) {
                         case "CLOSE_WINDOW":

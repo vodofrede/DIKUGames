@@ -13,7 +13,7 @@ namespace Breakout {
         // constructors
         private FileLoader() {
             maps = Directory.GetFiles(Path.Combine("Assets", "Levels"));
-            Console.WriteLine("Found levels: " + maps);
+            Array.Sort(maps, StringComparer.InvariantCulture);
         }
 
         // get instance
@@ -24,7 +24,7 @@ namespace Breakout {
         // methods
         public Map? NextMap() {
             var map = mapIndex < maps.Length ? ParseFile(maps[mapIndex]) : null;
-            mapIndex++;
+            mapIndex++;;
             return map;
         }
 
@@ -79,7 +79,6 @@ namespace Breakout {
             var blocks = new EntityContainer<Block>();
             foreach ((string line, float y) in mapString.Split("\n").Select((v, i) => (v, (float)i))) {
                 foreach ((char c, float x) in line.Select((v, i) => (v, (float)i))) {
-                    // Console.WriteLine("x: " + x + ", y: " +  y);
                     if (legend.ContainsKey(c)) {
                         if (meta.ContainsKey(c)) {
                             var type = meta[c];

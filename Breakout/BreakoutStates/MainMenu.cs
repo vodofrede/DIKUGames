@@ -15,8 +15,8 @@ namespace Breakout.BreakoutStates {
             new Image(Path.Combine("Assets", "Images", "SpaceBackground.png"))
         );
         private readonly Text[] menuButtons = new Text[] {
-            new Text(string.Format("New Game"), new Vec2F(0.5f, 0.5f), new Vec2F(0.1f, 0.1f)),
-            new Text(string.Format("Quit"), new Vec2F(0.5f, 0.4f), new Vec2F(0.1f, 0.1f))
+            new Text(string.Format("New Game"), new Vec2F(0.5f, 0.5f), new Vec2F(0.2f, 0.2f)),
+            new Text(string.Format("Quit"), new Vec2F(0.5f, 0.4f), new Vec2F(0.2f, 0.2f))
         };
         private int activeMenuButton;
 
@@ -49,6 +49,7 @@ namespace Breakout.BreakoutStates {
 
         public void UpdateState() {
             for (int i = 0; i < menuButtons.Length; i++) {
+                menuButtons[i].SetFontSize(3000);
                 if (i == activeMenuButton) {
                     menuButtons[i].SetColor(new Vec3I(255, 0, 0));
                 } else {
@@ -103,6 +104,8 @@ namespace Breakout.BreakoutStates {
 
                 case KeyboardKey.Enter:
                     if (activeMenuButton == 0) {
+                        FileLoader.GetInstance().ResetMaps();
+                        GameRunning.GetInstance().ResetState();
                         BreakoutBus.GetBus().RegisterEvent(
                             new GameEvent {
                                 EventType = GameEventType.GameStateEvent,

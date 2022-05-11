@@ -8,31 +8,41 @@ using DIKUArcade.State;
 
 namespace Breakout {
     public class GameRunning : IGameState {
+        /// <summary>
+        /// The singleton instance of GameRunning
+        /// </summary>
         private static GameRunning? instance;
 
         // constants
+        /// <summary>
+        /// Constants defined at the top of the file to avoid magic numbers
+        /// </summary>
         private const int LIVES = 3;
         private const float SPEEDINCREASE = 0.003f;
-        private const float MAXIMUM_ANGLE = (5 * MathF.PI) / 12;
-
-
-        private float BALLSPEED = 0.01f;
+        private const float MAXIMUM_ANGLE = 5 * MathF.PI / 12;
+        private const float INITIAL_BALLSPEED = 0.01f;
 
         // state
+        /// <summary>
+        /// GameRunning variables
+        /// </summary>
         private Score score;
         private int lives = LIVES;
         private float speedIncrease = SPEEDINCREASE;
+        private float ballSpeed = INITIAL_BALLSPEED;
+        private Text livesLeftText;
 
         // contained entities
+        /// <summary>
+        /// GameRunning entities
+        /// </summary>
         private Player player;
         private Map? map;
         private Ball ball;
 
-        // resources
-        private Text endGameText;
-        private Text scoreText;
-        private Text livesText;
-
+        /// <summary>
+        /// Singleton instances for convenience
+        /// </summary>
         private GameEventBus eventBus = BreakoutBus.GetBus();
         private FileLoader fileLoader = FileLoader.GetInstance();
 
@@ -43,13 +53,12 @@ namespace Breakout {
 
             ball = new Ball(new Vec2F(0.5f, 0.05f));
             map = fileLoader.NextMap();
-            score = new Score(new Vec2F(0.5f, 0.5f), new Vec2F(0.2f, 0.2f));
+            score = new Score(new Vec2F(0.8f, 0.8f), new Vec2F(0.2f, 0.2f));
 
-            // text
-            endGameText = new Text(string.Format("Game Over!"), new Vec2F(0.5f, 0.5f), new Vec2F(0.5f, 0.5f));
-            endGameText.SetColor(new Vec3I(0, 128, 255));
-
-            // winGameText
+            // livesLeftText
+            livesLeftText = new Text("Lives left: " + lives, new Vec2F(0.2f, 0.8f), new Vec2F(0.2f, 0.2f));
+            livesLeftText.SetFontSize(1000);
+            livesLeftText.SetColor(new Vec3I(0, 128, 255));
         }
 
         public static IGameState GetInstance() {
@@ -57,22 +66,22 @@ namespace Breakout {
         }
 
         public void RenderState() {
+            player.RenderEntity();
+            map?.RenderMap();
+            ball.RenderEntity();
             score.RenderScore();
-            if (lives == 0) {
-                endGameText.RenderText();
-            } else {
-                player.RenderEntity();
-                map?.RenderMap();
-                ball.RenderEntity();
-            }
+            livesLeftText.RenderText();
         }
 
         public void ResetState() {
             player = new Player(new Image(Path.Combine("Assets", "Images", "player.png")));
             eventBus.Subscribe(GameEventType.PlayerEvent, player);
             ball = new Ball(new Vec2F(0.5f, 0.05f));
+            ballSpeed = INITIAL_BALLSPEED;
             map = fileLoader.NextMap();
-            score = new Score(new Vec2F(0.5f, 0.5f), new Vec2F(0.2f, 0.2f));
+            score = new Score(new Vec2F(0.8f, 0.8f), new Vec2F(0.2f, 0.2f));
+            lives = LIVES;
+            livesLeftText.SetText("Lives left: " + lives);
         }
 
         public void UpdateState() {
@@ -96,9 +105,12 @@ namespace Breakout {
             } else {
                 // game is running
                 map.GetBlocks().Iterate(block => block.Update());
+
                 player.Move();
                 if (ball.Move()) {
                     ball = new Ball(new Vec2F(0.5f, 0.05f));
+                    lives--;
+                    livesLeftText.SetText("Lives left: " + lives);
                 }
 
                 DynamicShape dynamicBall = ball.Shape.AsDynamicShape();
@@ -107,7 +119,6 @@ namespace Breakout {
 
                 var playerCollision = CollisionDetection.Aabb(dynamicBall, player.Shape);
                 if (playerCollision.Collision) {
-
                     // finding middle of player shape
                     float playerMiddleX = player.Shape.Position.X + player.Shape.Extent.X / 2f;
                     // subtracting balls position to find relative impact (where on the player it hits)
@@ -119,9 +130,8 @@ namespace Breakout {
                     float bounceAngle = normalizedRelativeImpact * MAXIMUM_ANGLE;
 
                     // setting new x,y velocity
-                    ball.Velocity.Y = BALLSPEED * MathF.Cos(bounceAngle);
-                    ball.Velocity.X = BALLSPEED * -MathF.Sin(bounceAngle);
-
+                    ball.Velocity.Y = ballSpeed * MathF.Cos(bounceAngle);
+                    ball.Velocity.X = ballSpeed * -MathF.Sin(bounceAngle);
                 }
 
                 map.GetBlocks().Iterate(block => {
@@ -129,26 +139,19 @@ namespace Breakout {
 
                     if (blockCollision.Collision) {
                         if (score.Points != 0 && score.Points % 10 == 0) {
-                            BALLSPEED += speedIncrease;
+                            ballSpeed += speedIncrease;
                         }
 
                         var effect = block.DecreaseHitpoints();
                         switch (effect) {
-                            case BlockEffect.Destroy:
+                            case "Destroy":
                                 block.DeleteEntity();
                                 score.AddPoints(block.Value);
                                 break;
-                            case BlockEffect.Hungry:
+                            case "Hungry":
                                 ball = new Ball(new Vec2F(0.5f, 0.05f));
                                 block.DeleteEntity();
                                 score.AddPoints(block.Value);
-                                break;
-                            case BlockEffect.Reveal:
-                                map.GetBlocks().Iterate(block => {
-                                    if (block.Type == BlockType.Invisible) {
-                                        block.SwapImage();
-                                    }
-                                });
                                 break;
                             default:
                                 throw new NotImplementedException();
@@ -169,24 +172,20 @@ namespace Breakout {
                     };
                 });
 
-                if (map.GetBlocks().CountEntities() == 0) {
+                bool anyBlocksLeft = false;
+                map.GetBlocks().Iterate(block => {
+                    if (block.Type != "Unbreakable") {
+                        anyBlocksLeft = true;
+                    }
+                });
+                if (!anyBlocksLeft) {
                     // next level
                     map = fileLoader.NextMap();
+                    ResetState();
                 }
+
             }
         }
-
-        // Detect Collisions between ball and blocks
-        // bool collision = CollisionDetection.Aabb(ball, block.Shape).Collision;
-
-        // if (collision) {
-        // decrease Hitpoints
-
-        // if hitpoint <= 0 --> remove block and increase player score
-        // }
-
-        // Detect Collisions between ball and player
-        // change velocity of ball according to where it hits the player (position + extent)
 
         public void HandleKeyEvent(KeyboardAction keyboardAction, KeyboardKey keyboardKey) {
             switch (keyboardAction) {

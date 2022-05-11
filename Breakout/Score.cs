@@ -5,7 +5,7 @@ namespace Breakout {
     public class Score {
         private readonly Text display;
 
-        public int Points { get; private set; }
+        public uint Points { get; private set; }
 
         public Score(Vec2F position, Vec2F extent) {
             Points = 0;
@@ -15,7 +15,7 @@ namespace Breakout {
         }
 
         public void AddPoints(int value) {
-            Points += value;
+            Points += (uint)value;
             display.SetText(string.Format("Score: " + Points.ToString()));
         }
 
