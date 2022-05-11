@@ -17,10 +17,11 @@ namespace Breakout {
             new Image(Path.Combine("Assets", "Images", "SpaceBackground.png"))
         );
         private readonly Text[] menuButtons = new Text[] {
-            new Text(string.Format("Continue"), new Vec2F(0.5f, 0.5f), new Vec2F(0.1f, 0.1f)),
+            new Text(string.Format("Continue"), new Vec2F(0.5f, 0.6f), new Vec2F(0.1f, 0.1f)),
+            new Text(string.Format("Main Menu"), new Vec2F(0.5f, 0.5f), new Vec2F(0.1f, 0.1f)),
             new Text(string.Format("Quit"), new Vec2F(0.5f, 0.4f), new Vec2F(0.1f, 0.1f))
         };
-        private int activeMenuButton;
+        private int activeMenuButton = 0;
 
         public GamePaused() {
         }
@@ -86,7 +87,7 @@ namespace Breakout {
                     });
                     break;
 
-                case KeyboardKey.Up:
+                case KeyboardKey.Down:
                     if (activeMenuButton < menuButtons.Length - 1) {
                         activeMenuButton++;
                     } else {
@@ -95,7 +96,7 @@ namespace Breakout {
                     UpdateState();
                     break;
 
-                case KeyboardKey.Down:
+                case KeyboardKey.Up:
                     if (activeMenuButton > 0) {
                         activeMenuButton--;
                     } else {
@@ -113,6 +114,13 @@ namespace Breakout {
                                 Message = "GAME_RUNNING",
                             });
                     } else if (activeMenuButton == 1) {
+                        BreakoutBus.GetBus().RegisterEvent(
+                            new GameEvent {
+                                EventType = GameEventType.GameStateEvent,
+                                From = this,
+                                Message = "MAIN_MENU",
+                            });
+                    } else if (activeMenuButton == 2) {
                         BreakoutBus.GetBus().RegisterEvent(
                             new GameEvent {
                                 EventType = GameEventType.WindowEvent,
