@@ -244,6 +244,14 @@ namespace Breakout {
                     });
                     break;
 
+                case KeyboardKey.P:
+                    BreakoutBus.GetBus().RegisterEvent(new GameEvent {
+                        EventType = GameEventType.GameStateEvent,
+                        From = this,
+                        Message = "GAME_PAUSED"
+                    });
+                    break;
+
                 case KeyboardKey.Escape:
                     BreakoutBus.GetBus().RegisterEvent(new GameEvent {
                         EventType = GameEventType.WindowEvent,
