@@ -1,9 +1,6 @@
 using System;
-using System.IO;
-using Breakout;
 using Breakout.Block;
 using DIKUArcade.Entities;
-using DIKUArcade.Graphics;
 using DIKUArcade.GUI;
 using DIKUArcade.Math;
 using NUnit.Framework;

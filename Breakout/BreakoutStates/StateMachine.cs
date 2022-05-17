@@ -12,6 +12,7 @@ namespace Breakout.BreakoutStates {
             BreakoutBus.GetBus().Subscribe(GameEventType.InputEvent, this);
             _ = GameRunning.GetInstance();
             _ = GamePaused.GetInstance();
+            _ = GameOver.GetInstance();
 
 
             // følgende statement forhindrer en lint warning
@@ -26,6 +27,9 @@ namespace Breakout.BreakoutStates {
             switch (gameEvent.EventType) {
                 case GameEventType.GameStateEvent:
                     switch (gameEvent.Message) {
+                        case "GAME_OVER":
+                            SwitchState(GameStateType.GameOver);
+                            break;
                         case "GAME_RUNNING":
                             SwitchState(GameStateType.GameRunning);
                             break;
@@ -58,6 +62,9 @@ namespace Breakout.BreakoutStates {
         /// </summary>
         private void SwitchState(GameStateType stateType) {
             switch (stateType) {
+                case GameStateType.GameOver:
+                    ActiveState = GameOver.GetInstance();
+                    break;
                 case GameStateType.MainMenu:
                     ActiveState = MainMenu.GetInstance();
                     break;

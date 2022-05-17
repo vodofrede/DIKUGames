@@ -8,7 +8,9 @@ namespace Breakout {
     public class Player : Entity, IGameEventProcessor {
         private float moveLeft;
         private float moveRight;
-        private const float MOVEMENT_SPEED = 0.035f;
+
+        public const float MOVEMENT_SPEED = 0.035f;
+        public float MovementSpeed = MOVEMENT_SPEED;
 
         public Player(IBaseImage image) : base(new DynamicShape(new Vec2F(0.45f, 0.1f), new Vec2F(0.2f, 0.02f)), image) { }
 
@@ -47,14 +49,14 @@ namespace Breakout {
         /// </summary>
         public void Move() {
             Shape.Move();
-            Shape.Position.X = Math.Clamp(Shape.Position.X, 0.0f, 1f - Shape.Extent.X);
+            Shape.Position.X = Math.Clamp(Shape.Position.X, 0.0f, Math.Max(1f - Shape.Extent.X, 0.0f));
         }
 
         /// <summary>
         /// Make the player move left
         /// </summary>
         public void SetMoveLeft(bool val) {
-            moveLeft = val ? -MOVEMENT_SPEED : 0.0f;
+            moveLeft = val ? -MovementSpeed : 0.0f;
             UpdateDirection();
         }
 
@@ -62,7 +64,7 @@ namespace Breakout {
         /// Make the player move right
         /// </summary>
         public void SetMoveRight(bool val) {
-            moveRight = val ? MOVEMENT_SPEED : 0.0f;
+            moveRight = val ? MovementSpeed : 0.0f;
             UpdateDirection();
         }
 

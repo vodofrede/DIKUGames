@@ -17,7 +17,7 @@ namespace Breakout {
 
             // event bus    
             GameEventBus eventBus = BreakoutBus.GetBus();
-            eventBus.InitializeEventBus(new List<GameEventType> { GameEventType.InputEvent, GameEventType.PlayerEvent, GameEventType.WindowEvent, GameEventType.GameStateEvent });
+            eventBus.InitializeEventBus(new List<GameEventType> { GameEventType.InputEvent, GameEventType.PlayerEvent, GameEventType.WindowEvent, GameEventType.GameStateEvent, GameEventType.TimedEvent });
             eventBus.Subscribe(GameEventType.WindowEvent, this);
             eventBus.Subscribe(GameEventType.GameStateEvent, stateMachine);
 
@@ -35,7 +35,7 @@ namespace Breakout {
                         case "CLOSE_WINDOW":
                             window.CloseWindow();
                             break;
-                        
+
                     }
                     break;
             }

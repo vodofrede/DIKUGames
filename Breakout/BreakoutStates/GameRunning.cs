@@ -5,9 +5,10 @@ using DIKUArcade.Input;
 using DIKUArcade.Math;
 using DIKUArcade.Physics;
 using DIKUArcade.State;
+using DIKUArcade.Timers;
 
 namespace Breakout {
-    public class GameRunning : IGameState {
+    public class GameRunning : IGameState, IGameEventProcessor {
         private static GameRunning? instance;
 
         // constants
@@ -22,21 +23,30 @@ namespace Breakout {
         private float speedIncrease = SPEEDINCREASE;
         private float ballSpeed = INITIAL_BALLSPEED;
         private Text livesLeftText;
+        private bool invincible = false;
 
         // contained entities
+        private long levelTimeLimit;
+        private long levelStartTime;
+        private long levelCurrentTime;
         private Player player;
+        private GameOver gameOver;
         private Map? map;
         private Ball ball;
+        private EntityContainer<PowerUp> PowerUps;
 
         private GameEventBus eventBus = BreakoutBus.GetBus();
         private FileLoader fileLoader = FileLoader.GetInstance();
 
         public GameRunning() {
+            gameOver = (GameOver)GameOver.GetInstance();
+
             // game entities
             player = new Player(new Image(Path.Combine("Assets", "Images", "player.png")));
             eventBus.Subscribe(GameEventType.PlayerEvent, player);
+            eventBus.Subscribe(GameEventType.TimedEvent, this);
 
-            ball = new Ball(new Vec2F(0.5f, 0.05f));
+            ball = new Ball(new Vec2F(0.5f, 0.15f));
             map = fileLoader.NextMap();
             score = new Score(new Vec2F(0.8f, 0.8f), new Vec2F(0.2f, 0.2f));
 
@@ -44,6 +54,10 @@ namespace Breakout {
             livesLeftText = new Text("Lives left: " + lives, new Vec2F(0.2f, 0.8f), new Vec2F(0.2f, 0.2f));
             livesLeftText.SetFontSize(1000);
             livesLeftText.SetColor(new Vec3I(0, 128, 255));
+
+            PowerUps = new EntityContainer<PowerUp>();
+            levelStartTime = StaticTimer.GetElapsedMilliseconds();
+            levelTimeLimit = map.GetTimeLimit();
         }
 
         /// <summary>
@@ -59,6 +73,7 @@ namespace Breakout {
         public void RenderState() {
             player.RenderEntity();
             map?.RenderMap();
+            PowerUps.RenderEntities();
             ball.RenderEntity();
             score.RenderScore();
             livesLeftText.RenderText();
@@ -71,7 +86,7 @@ namespace Breakout {
         public void ResetState() {
             player = new Player(new Image(Path.Combine("Assets", "Images", "player.png")));
             eventBus.Subscribe(GameEventType.PlayerEvent, player);
-            ball = new Ball(new Vec2F(0.5f, 0.05f));
+            ball = new Ball(new Vec2F(0.5f, 0.15f));
             ballSpeed = INITIAL_BALLSPEED;
             map = fileLoader.NextMap();
             score = new Score(new Vec2F(0.8f, 0.8f), new Vec2F(0.2f, 0.2f));
@@ -83,40 +98,110 @@ namespace Breakout {
         /// Update State
         /// </summary>
         public void UpdateState() {
+            levelCurrentTime = StaticTimer.GetElapsedMilliseconds();
+            bool timeExpired = levelCurrentTime - levelStartTime > levelTimeLimit;
+            Console.WriteLine("Level start time: " + levelStartTime);
+            Console.WriteLine("Level time limit: " + levelTimeLimit);
+            Console.WriteLine("Level current time: " + levelCurrentTime);
+            Console.WriteLine("Time Expired: " + timeExpired);
             if (lives > 0 && map == null) {
                 // entire game is won
+                // go to game over menu
                 fileLoader.ResetMaps();
+                gameOver.WonGame = true;
+                // gameOver.Score = score.Points;
+                // WonGame = false;
                 eventBus.RegisterEvent(new GameEvent {
                     EventType = GameEventType.GameStateEvent,
                     From = this,
-                    Message = "MAIN_MENU"
+                    Message = "GAME_OVER"
                 });
-            } else if (lives == 0) {
+            } else if (lives == 0 || timeExpired) {
+                // gameOver.Score = score.Points;
                 // level is lost
-                // restart level?
+                // go to game over menu
                 fileLoader.ResetMaps();
                 eventBus.RegisterEvent(new GameEvent {
                     EventType = GameEventType.GameStateEvent,
                     From = this,
-                    Message = "MAIN_MENU"
+                    Message = "GAME_OVER"
                 });
             } else {
+                eventBus.ProcessEventsSequentially();
+
                 // game is running
                 map?.GetBlocks().Iterate(block => block.Update());
+                PowerUps.Iterate(powerUp => {
+                    powerUp.Update();
+                    var dynamic = powerUp.Shape.AsDynamicShape();
+                    dynamic.Direction.X = 0.0f;
+                    dynamic.Direction.Y = -0.01f;
+                    if (CollisionDetection.Aabb(dynamic, player.Shape).Collision) {
+                        switch (powerUp.Effect) {
+                            case "ExtraLife":
+                                lives++;
+                                powerUp.DeleteEntity();
+                                break;
+                            case "WidePowerUp":
+                                if (player.Shape.Extent.X < 0.4f) player.Shape.ScaleXFromCenter(2f);
+                                eventBus.RegisterTimedEvent(new GameEvent {
+                                    EventType = GameEventType.PlayerEvent,
+                                    From = this,
+                                    To = this,
+                                    Message = "WIDE_STOP"
+                                }, TimePeriod.NewMilliseconds(5000));
+                                powerUp.DeleteEntity();
+                                break;
+                            case "SpeedPowerUp":
+                                player.MovementSpeed *= Player.MOVEMENT_SPEED * 1.5f;
+                                eventBus.RegisterTimedEvent(new GameEvent {
+                                    EventType = GameEventType.PlayerEvent,
+                                    From = this,
+                                    To = this,
+                                    Message = "SPEED_STOP"
+                                }, TimePeriod.NewMilliseconds(5000));
+                                powerUp.DeleteEntity();
+                                break;
+                            case "Invincible":
+                                invincible = true;
+                                eventBus.RegisterTimedEvent(new GameEvent {
+                                    EventType = GameEventType.PlayerEvent,
+                                    From = this,
+                                    To = this,
+                                    Message = "INVINCIBLE_STOP"
+                                }, TimePeriod.NewMilliseconds(5000));
+                                break;
+                            case "DoubleSize":
+                                invincible = true;
+                                eventBus.RegisterTimedEvent(new GameEvent {
+                                    EventType = GameEventType.PlayerEvent,
+                                    From = this,
+                                    To = this,
+                                    Message = "INVINCIBLE_STOP"
+                                }, TimePeriod.NewMilliseconds(5000));
+                                break;
+                            default:
+                                powerUp.DeleteEntity();
+                                break;
+                        }
+                    }
+                    if (powerUp.Shape.Position.Y < -1.0f) {
+                        powerUp.DeleteEntity();
+                    }
+                });
 
                 player.Move();
                 if (ball.Move()) {
-                    ball = new Ball(new Vec2F(0.5f, 0.05f));
-                    lives--;
-                    livesLeftText.SetText("Lives left: " + lives);
+                    ball = new Ball(new Vec2F(0.5f, 0.5f));
+                    if (!invincible) lives--;
                 }
 
                 DynamicShape dynamicBall = ball.Shape.AsDynamicShape();
                 dynamicBall.Direction.X = ball.Velocity.X;
                 dynamicBall.Direction.Y = ball.Velocity.Y;
 
-                var playerCollision = CollisionDetection.Aabb(dynamicBall, player.Shape);
-                if (playerCollision.Collision) {
+                var paddleCollision = CollisionDetection.Aabb(dynamicBall, player.Shape);
+                if (paddleCollision.Collision && ball.Velocity.Y < 0.0f) {
                     // finding middle of player shape
                     float playerMiddleX = player.Shape.Position.X + player.Shape.Extent.X / 2f;
                     // subtracting balls position to find relative impact (where on the player it hits)
@@ -140,6 +225,7 @@ namespace Breakout {
                             ballSpeed += speedIncrease;
                         }
 
+                        Vec2F blockPosition = block.Shape.Position;
                         var effect = block.DecreaseHitpoints();
                         switch (effect) {
                             case "Destroy":
@@ -147,9 +233,24 @@ namespace Breakout {
                                 score.AddPoints(block.Value);
                                 break;
                             case "Hungry":
-                                ball = new Ball(new Vec2F(0.5f, 0.05f));
+                                ball = new Ball(new Vec2F(0.5f, 0.15f));
                                 block.DeleteEntity();
                                 score.AddPoints(block.Value);
+                                break;
+                            case "ExtraLife":
+                                PowerUp extraLife = new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "heart_filled.png")), "ExtraLife");
+                                PowerUps.AddEntity(extraLife);
+                                block.DeleteEntity();
+                                break;
+                            case "WidePowerUp":
+                                PowerUp widePowerUp = new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "WidePowerUp.png")), "WidePowerUp");
+                                PowerUps.AddEntity(widePowerUp);
+                                block.DeleteEntity();
+                                break;
+                            case "SpeedPowerUp":
+                                PowerUp speedPowerUp = new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "DoubleSpeedPowerUp.png")), "SpeedPowerUp");
+                                PowerUps.AddEntity(speedPowerUp);
+                                block.DeleteEntity();
                                 break;
                             default:
                                 throw new NotImplementedException();
@@ -168,6 +269,8 @@ namespace Breakout {
                                 break;
                         }
                     };
+
+
                 });
 
                 bool anyBlocksLeft = false;
@@ -183,6 +286,7 @@ namespace Breakout {
                 }
 
             }
+            livesLeftText.SetText("Lives left: " + lives);
         }
 
         /// <summary>
@@ -268,5 +372,18 @@ namespace Breakout {
             }
         }
 
+        public void ProcessEvent(GameEvent gameEvent) {
+            Console.WriteLine("Got game event");
+            Console.WriteLine(gameEvent);
+
+            switch (gameEvent.Message) {
+                case "WIDE_STOP":
+                    player.Shape.Extent.X = 0.2f;
+                    break;
+                case "INVINCIBLE_STOP":
+                    invincible = false;
+                    break;
+            }
+        }
     }
 }

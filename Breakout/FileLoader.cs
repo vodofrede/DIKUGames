@@ -13,8 +13,9 @@ namespace Breakout {
 
         // constructors
         private FileLoader() {
-            maps = Directory.GetFiles(Path.Combine("Assets", "Levels"));
-            Array.Sort(maps, StringComparer.InvariantCulture);
+            maps = new string[] { Path.Combine("Assets", "Levels", "level2.txt") };
+            // maps = Directory.GetFiles(Path.Combine("Assets", "Levels"));
+            // Array.Sort(maps, StringComparer.InvariantCulture);
         }
 
         // get instance
@@ -28,7 +29,7 @@ namespace Breakout {
         /// </summary>
         public Map? NextMap() {
             var map = mapIndex < maps.Length ? ParseFile(maps[mapIndex]) : null;
-            mapIndex++;;
+            mapIndex++; ;
             return map;
         }
 
@@ -61,13 +62,14 @@ namespace Breakout {
 
             // parse meta
             string name = "placeholder";
-            int timeLimit = 0;
+            int timeLimit = 9999 * 1000;
             var meta = new Dictionary<char, string>();
             foreach (string line in metaString.Split("\n")) {
                 if (line.StartsWith("Name")) {
                     name = line[6..];
                 } else if (line.StartsWith("Time")) {
-                    timeLimit = int.Parse(line[6..]);
+                    Console.WriteLine("Found time limit");
+                    timeLimit = int.Parse(line[6..]) * 1000;
                 } else if (line.StartsWith("Hardened")) {
                     meta[line[10]] = "Hardened";
                 } else if (line.StartsWith("PowerUp")) {
@@ -97,7 +99,7 @@ namespace Breakout {
                                     blocks.AddEntity(new Hardened(new Vec2F(x, y), legend[c]));
                                     break;
                                 case "PowerUp":
-                                    blocks.AddEntity(new Hungry(new Vec2F(x, y), legend[c]));
+                                    blocks.AddEntity(new WidePowerUp(new Vec2F(x, y), legend[c]));
                                     break;
                                 case "Unbreakable":
                                     blocks.AddEntity(new Unbreakable(new Vec2F(x, y), legend[c]));

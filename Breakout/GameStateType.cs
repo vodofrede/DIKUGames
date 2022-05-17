@@ -2,6 +2,7 @@ using System;
 
 namespace Breakout {
     public enum GameStateType {
+        GameOver,
         GameRunning,
         GamePaused,
         MainMenu,
@@ -14,6 +15,7 @@ namespace Breakout {
         /// </summary>
         public static GameStateType TransformStringToState(string state) {
             return state switch {
+                "GAME_OVER" => GameStateType.GameOver,
                 "GAME_RUNNING" => GameStateType.GameRunning,
                 "GAME_PAUSED" => GameStateType.GamePaused,
                 "MAIN_MENU" => GameStateType.MainMenu,
@@ -26,6 +28,7 @@ namespace Breakout {
         /// </summary>
         public static string TransformStateToString(GameStateType state) {
             return state switch {
+                GameStateType.GameOver => "GAME_OVER",
                 GameStateType.GameRunning => "GAME_RUNNING",
                 GameStateType.GamePaused => "GAME_PAUSED",
                 GameStateType.MainMenu => "MAIN_MENU",
