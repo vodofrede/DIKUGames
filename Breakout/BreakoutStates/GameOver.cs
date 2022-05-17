@@ -17,12 +17,14 @@ namespace Breakout {
         );
 
         // TODO: Should display if the game was won or lost and the score
-        private readonly Text gameWonText = new Text(string.Format("The game is over! You won"), new Vec2F(0.5f, 0.7f), new Vec2F(0.2f, 0.2f));
-        private readonly Text gameLostText = new Text(string.Format("The game is over! You lost"), new Vec2F(0.5f, 0.7f), new Vec2F(0.2f, 0.2f));
+        private readonly Text gameWonText = new Text(string.Format("The game is over! You won"), new Vec2F(0.5f, 0.7f), new Vec2F(0.4f, 0.4f));
+        private readonly Text gameLostText = new Text(string.Format("The game is over! You lost"), new Vec2F(0.5f, 0.7f), new Vec2F(0.4f, 0.4f));
+            
+
 
 
         private readonly Text[] menuButtons = new Text[] {
-            new Text(string.Format("Go to Main Menu"), new Vec2F(0.5f, 0.5f), new Vec2F(0.2f, 0.2f)),
+            new Text(string.Format("Main Menu"), new Vec2F(0.5f, 0.5f), new Vec2F(0.2f, 0.2f)),
             new Text(string.Format("Quit"), new Vec2F(0.5f, 0.4f), new Vec2F(0.2f, 0.2f))
         };
 
@@ -43,11 +45,17 @@ namespace Breakout {
             backGroundImage.RenderEntity();
 
             if (WonGame) {
+                gameWonText.SetColor(new Vec3I(0, 255, 0));
+                gameWonText.SetFontSize(3000);
                 gameWonText.RenderText();
             } else {
+                gameLostText.SetColor(new Vec3I(255, 165, 0));
+                gameLostText.SetFontSize(3000);
                 gameLostText.RenderText();
             }
-            Text scoreText = new Text(string.Format("Your score was: " + Score), new Vec2F(0.5f, 0.6f), new Vec2F(0.2f, 0.2f));
+            Text scoreText = new Text(string.Format("Your score was: " + Score), new Vec2F(0.5f, 0.6f), new Vec2F(0.4f, 0.4f));
+            scoreText.SetColor(new Vec3I(138, 43, 226));
+            scoreText.SetFontSize(1000);
             scoreText.RenderText();
 
             // render menu buttons
@@ -76,6 +84,7 @@ namespace Breakout {
         /// Update the Game State
         /// </summary>
         public void UpdateState() {
+
             for (int i = 0; i < menuButtons.Length; i++) {
                 if (i == activeMenuButton) {
                     menuButtons[i].SetColor(new Vec3I(255, 0, 0));
