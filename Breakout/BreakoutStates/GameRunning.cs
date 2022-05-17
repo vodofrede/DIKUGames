@@ -153,7 +153,7 @@ namespace Breakout {
                                 powerUp.DeleteEntity();
                                 break;
                             case "SpeedPowerUp":
-                                player.MovementSpeed *= Player.MOVEMENT_SPEED * 1.5f;
+                                if (player.MovementSpeed < 0.08) player.MovementSpeed = Player.MOVEMENT_SPEED * 1.5f;
                                 eventBus.RegisterTimedEvent(new GameEvent {
                                     EventType = GameEventType.PlayerEvent,
                                     From = this,
@@ -170,15 +170,17 @@ namespace Breakout {
                                     To = this,
                                     Message = "INVINCIBLE_STOP"
                                 }, TimePeriod.NewMilliseconds(5000));
+                                powerUp.DeleteEntity();
                                 break;
                             case "DoubleSize":
-                                invincible = true;
+                                if (ball.Shape.Extent.X < 0.41f) ball.Shape.ScaleFromCenter(2f);
                                 eventBus.RegisterTimedEvent(new GameEvent {
                                     EventType = GameEventType.PlayerEvent,
                                     From = this,
                                     To = this,
-                                    Message = "INVINCIBLE_STOP"
+                                    Message = "DOUBLE_SIZE_STOP"
                                 }, TimePeriod.NewMilliseconds(5000));
+                                powerUp.DeleteEntity();
                                 break;
                             default:
                                 powerUp.DeleteEntity();
@@ -245,6 +247,16 @@ namespace Breakout {
                             case "WidePowerUp":
                                 PowerUp widePowerUp = new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "WidePowerUp.png")), "WidePowerUp");
                                 PowerUps.AddEntity(widePowerUp);
+                                block.DeleteEntity();
+                                break;
+                            case "DoubleSize":
+                                PowerUp doubleSize = new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "BigPowerUp.png")), "DoubleSize");
+                                PowerUps.AddEntity(doubleSize);
+                                block.DeleteEntity();
+                                break;
+                            case "Invincible":
+                                PowerUp invincible = new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "InfinitePowerUp.png")), "Invincible");
+                                PowerUps.AddEntity(invincible);
                                 block.DeleteEntity();
                                 break;
                             case "SpeedPowerUp":
@@ -382,6 +394,12 @@ namespace Breakout {
                     break;
                 case "INVINCIBLE_STOP":
                     invincible = false;
+                    break;
+                case "SPEED_STOP":
+                    player.MovementSpeed = Player.MOVEMENT_SPEED;
+                    break;
+                case "DOUBLE_SIZE_STOP":
+                    ball.Shape.Extent = new Vec2F(0.1f, 0.1f);
                     break;
             }
         }
