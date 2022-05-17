@@ -86,7 +86,7 @@ namespace Breakout {
             }
 
             // parse map
-            var blocks = new EntityContainer<Standard>();
+            var blocks = new EntityContainer<StandardBlock>();
             foreach ((string line, float y) in mapString.Split("\n").Select((v, i) => (v, (float)i))) {
                 foreach ((char c, float x) in line.Select((v, i) => (v, (float)i))) {
                     if (legend.ContainsKey(c)) {
@@ -104,7 +104,7 @@ namespace Breakout {
                                     break;
                             }
                         } else {
-                            blocks.AddEntity(new Standard(new Vec2F(x, y), legend[c]));
+                            blocks.AddEntity(new StandardBlock(new Vec2F(x, y), legend[c]));
                         }
                     }
                 }

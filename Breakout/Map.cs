@@ -7,9 +7,9 @@ namespace Breakout {
         private string name {get;}
         private int timeLimit {get;}
 
-        private EntityContainer<Standard> blocks { get; }
+        private EntityContainer<StandardBlock> blocks { get; }
         
-        public Map(string name, int timeLimit, EntityContainer<Standard> blocks) {
+        public Map(string name, int timeLimit, EntityContainer<StandardBlock> blocks) {
             this.name = name;
             this.timeLimit = timeLimit;
             this.blocks = blocks;
@@ -25,7 +25,7 @@ namespace Breakout {
         /// <summary>
         /// Get all blocks as an entitycontainer
         /// </summary>
-        public EntityContainer<Standard> GetBlocks() {
+        public EntityContainer<StandardBlock> GetBlocks() {
             return blocks;
         }
 

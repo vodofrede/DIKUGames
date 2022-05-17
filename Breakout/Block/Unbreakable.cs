@@ -3,7 +3,7 @@ using DIKUArcade.Graphics;
 using DIKUArcade.Math;
 
 namespace Breakout.Block {
-    public class Unbreakable : Standard {
+    public class Unbreakable : StandardBlock {
         public Unbreakable(Vec2F pos, string imageName) : base(pos, imageName) {
             Hitpoints = 1;
             Value = 1;

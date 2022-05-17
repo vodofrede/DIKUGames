@@ -11,7 +11,9 @@ using NUnit.Framework;
 namespace BreakoutTests;
 
 public class TestBlock {
+#pragma warning disable CS8618
     StandardBlock block;
+#pragma warning restore CS8618
 
     [SetUp]
     public void Setup() {

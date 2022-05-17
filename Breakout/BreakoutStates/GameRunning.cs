@@ -102,7 +102,7 @@ namespace Breakout {
                 });
             } else {
                 // game is running
-                map.GetBlocks().Iterate(block => block.Update());
+                map?.GetBlocks().Iterate(block => block.Update());
 
                 player.Move();
                 if (ball.Move()) {
@@ -132,7 +132,7 @@ namespace Breakout {
                     ball.Velocity.X = ballSpeed * -MathF.Sin(bounceAngle);
                 }
 
-                map.GetBlocks().Iterate(block => {
+                map?.GetBlocks().Iterate(block => {
                     var blockCollision = CollisionDetection.Aabb(dynamicBall, block.Shape);
 
                     if (blockCollision.Collision) {
@@ -171,7 +171,7 @@ namespace Breakout {
                 });
 
                 bool anyBlocksLeft = false;
-                map.GetBlocks().Iterate(block => {
+                map?.GetBlocks().Iterate(block => {
                     if (block.Type != "Unbreakable") {
                         anyBlocksLeft = true;
                     }
