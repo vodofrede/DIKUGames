@@ -8,16 +8,15 @@ using DIKUArcade.Input;
 using DIKUArcade.Math;
 
 namespace Breakout {
-
     public class Game : DIKUGame, IGameEventProcessor {
+        private EventBus eventBus;
         private StateMachine stateMachine;
 
         public Game(WindowArgs windowArgs) : base(windowArgs) {
+            eventBus = new EventBus();
             stateMachine = new StateMachine();
 
-            // event bus    
-            GameEventBus eventBus = BreakoutBus.GetBus();
-            eventBus.InitializeEventBus(new List<GameEventType> { GameEventType.InputEvent, GameEventType.PlayerEvent, GameEventType.WindowEvent, GameEventType.GameStateEvent, GameEventType.TimedEvent });
+            // event bus
             eventBus.Subscribe(GameEventType.WindowEvent, this);
             eventBus.Subscribe(GameEventType.GameStateEvent, stateMachine);
 
@@ -61,7 +60,7 @@ namespace Breakout {
         /// </summary>
         public override void Update() {
             window.PollEvents();
-            BreakoutBus.GetBus().ProcessEventsSequentially();
+            BreakoutBus.EventBus.ProcessEventsSequentially();
             stateMachine.ActiveState.UpdateState();
         }
     }
