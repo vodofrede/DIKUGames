@@ -99,7 +99,7 @@ namespace Breakout {
                                     blocks.AddEntity(new Hardened(new Vec2F(x, y), legend[c]));
                                     break;
                                 case "PowerUp":
-                                    blocks.AddEntity(new WidePowerUp(new Vec2F(x, y), legend[c]));
+                                    blocks.AddEntity(new SpeedPowerUp(new Vec2F(x, y), legend[c]));
                                     break;
                                 case "Unbreakable":
                                     blocks.AddEntity(new Unbreakable(new Vec2F(x, y), legend[c]));
