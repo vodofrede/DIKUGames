@@ -2,19 +2,19 @@ using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 using DIKUArcade.Math;
 
-namespace Breakout.Block {
-    public class ExtraLife : StandardBlock {
-        public ExtraLife(Vec2F pos, string imageName) : base(pos, imageName) {
+namespace Breakout.Blocks {
+    public class WidePowerUp : StandardBlock {
+        public WidePowerUp(Vec2F pos, string imageName) : base(pos, imageName) {
             Hitpoints = 1;
             Value = 1;
-            Type = "ExtraLife";
+            Type = "WidePowerUp";
         }
 
         /// <summary>
         /// Decrease hitpoints and return an effect
         /// </summary>
         public override string DecreaseHitpoints() {
-            return "ExtraLife";
+            return "WidePowerUp";
         }
     }
 }

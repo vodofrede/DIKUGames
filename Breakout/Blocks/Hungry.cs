@@ -2,7 +2,7 @@ using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 using DIKUArcade.Math;
 
-namespace Breakout.Block {
+namespace Breakout.Blocks {
     public class Hungry : StandardBlock {
         public Hungry(Vec2F pos, string imageName) : base(pos, imageName) {
             Hitpoints = 2;

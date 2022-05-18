@@ -4,20 +4,30 @@ using DIKUArcade.State;
 namespace Breakout.BreakoutStates {
 
     public class StateMachine : IGameEventProcessor {
+        protected EventBus eventBus;
+        protected Dictionary<string, IGameState> states;
+        public IGameState? ActiveState { get; private set; }
 
-        public IGameState ActiveState { get; private set; }
+        public StateMachine(EventBus eventBus) {
+            this.eventBus = eventBus;
 
-        public StateMachine() {
-            BreakoutBus.GetBus().Subscribe(GameEventType.GameStateEvent, this);
-            BreakoutBus.GetBus().Subscribe(GameEventType.InputEvent, this);
-            _ = GameRunning.GetInstance();
-            _ = GamePaused.GetInstance();
-            _ = GameOver.GetInstance();
+            eventBus.Subscribe(GameEventType.GameStateEvent, this);
+            eventBus.Subscribe(GameEventType.InputEvent, this);
 
+            states = new();
+        }
 
-            // følgende statement forhindrer en lint warning
-            ActiveState = MainMenu.GetInstance();
-            // SwitchState(GameStateType.MainMenu);
+        /// <summary>
+        /// Adds a state and sets it to active if it is the first state to be added.
+        /// </summary>
+        public void AddState(IGameState gameState) {
+            string name = gameState.GetType().ToString();
+
+            if (ActiveState == null && states.Count == 0) {
+                ActiveState = gameState;
+            }
+
+            states.Add(name, gameState);
         }
 
         /// <summary>
@@ -27,23 +37,17 @@ namespace Breakout.BreakoutStates {
             switch (gameEvent.EventType) {
                 case GameEventType.GameStateEvent:
                     switch (gameEvent.Message) {
-                        case "GAME_OVER":
-                            SwitchState(GameStateType.GameOver);
+                        case "SWITCH_STATE":
+                            SwitchState(gameEvent.StringArg1);
                             break;
-                        case "GAME_RUNNING":
-                            SwitchState(GameStateType.GameRunning);
-                            break;
-                        case "MAIN_MENU":
-                            SwitchState(GameStateType.MainMenu);
-                            break;
-                        case "GAME_PAUSED":
-                            SwitchState(GameStateType.GamePaused);
+                        case "RESET_STATE":
+                            states[gameEvent.StringArg1]?.ResetState();
                             break;
                     }
                     break;
                 case GameEventType.InputEvent:
                     if (gameEvent.Message == "CLOSE_WINDOW") {
-                        BreakoutBus.GetBus().RegisterEvent(
+                        eventBus.RegisterEvent(
                             new GameEvent {
                                 EventType = GameEventType.GameStateEvent,
                                 From = this,
@@ -60,23 +64,8 @@ namespace Breakout.BreakoutStates {
         /// <summary>
         /// Switch the state of the state machine
         /// </summary>
-        private void SwitchState(GameStateType stateType) {
-            switch (stateType) {
-                case GameStateType.GameOver:
-                    ActiveState = GameOver.GetInstance();
-                    break;
-                case GameStateType.MainMenu:
-                    ActiveState = MainMenu.GetInstance();
-                    break;
-                case GameStateType.GameRunning:
-                    ActiveState = GameRunning.GetInstance();
-                    break;
-                case GameStateType.GamePaused:
-                    ActiveState = GamePaused.GetInstance();
-                    break;
-                default:
-                    break;
-            }
+        public void SwitchState(string name) {
+            ActiveState = states[name] ?? ActiveState;
         }
     }
 }

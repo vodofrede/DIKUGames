@@ -1,54 +1,48 @@
 using System.Text.RegularExpressions;
-using Breakout.Block;
+using Breakout.Blocks;
 using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 using DIKUArcade.Math;
 
 namespace Breakout {
-    public class FileLoader {
-        private static FileLoader? instance;
-
-        private string[] maps;
-        private int mapIndex = 0;
+    public class LevelLoader {
+        // fields
+        private List<Level> levels;
+        private int levelIndex = 0;
 
         // constructors
-        private FileLoader() {
-            maps = new string[] { Path.Combine("Assets", "Levels", "level2.txt") };
-            // maps = Directory.GetFiles(Path.Combine("Assets", "Levels"));
-            // Array.Sort(maps, StringComparer.InvariantCulture);
+        public LevelLoader(List<Level> levels) {
+            this.levels = levels;
         }
-
-        // get instance
-        public static FileLoader GetInstance() {
-            return instance ?? (instance = new FileLoader());
-        }
+        public LevelLoader(List<string> levelPaths) : this(levelPaths.Select(levelPath => TryParseFile(levelPath)).ToList()) { }
+        public LevelLoader() : this(Directory.GetFiles(Path.Combine("Assets", "Levels")).ToList()) { }
 
         // methods
         /// <summary>
-        /// Get the next map in the list of maps
+        /// Get the next level in the list of maps
         /// </summary>
-        public Map? NextMap() {
-            var map = mapIndex < maps.Length ? ParseFile(maps[mapIndex]) : null;
-            mapIndex++; ;
-            return map;
+        public Level? Next() {
+            var level = levelIndex < levels.Count ? levels[levelIndex] : null;
+            levelIndex++; ;
+            return level;
         }
 
         /// <summary>
-        /// Reset the map index
+        /// Reset the level index
         /// </summary>
-        public void ResetMaps() {
-            mapIndex = 0;
+        public void Reset() {
+            levelIndex = 0;
         }
 
-        private static string mapPattern = @"(Map:\n)((.*\n)*)(Map\/)";
+        private static string mapPattern = @"(Level:\n)((.*\n)*)(Level\/)";
         private static string metaPattern = @"(Meta:\n)((.*\n)*)(Meta\/)";
         private static string legendPattern = @"(Legend:\n)((.*\n)*)(Legend\/)";
 
         // static methods
         /// <summary>
-        /// Parse a path into a map
+        /// Parse a path into a level
         /// </summary>
-        public static Map ParseFile(string filePath) {
+        public static Level ParseFile(string filePath) {
             string file = File.ReadAllText(filePath);
             string normalized = Regex.Replace(file, @"\r\n|\n\r|\n|\r", "\n");
 
@@ -87,8 +81,8 @@ namespace Breakout {
                 legend[left] = right;
             }
 
-            // parse map
-            var blocks = new EntityContainer<StandardBlock>();
+            // parse level
+            var blocks = new EntityContainer<Block>();
             foreach ((string line, float y) in mapString.Split("\n").Select((v, i) => (v, (float)i))) {
                 foreach ((char c, float x) in line.Select((v, i) => (v, (float)i))) {
                     if (legend.ContainsKey(c)) {
@@ -112,23 +106,22 @@ namespace Breakout {
                 }
             }
 
-            return new Map(name, timeLimit, blocks);
+            return new Level(name, timeLimit, blocks);
         }
 
         /// <summary>
-        /// Catch any errors from parsing a map file
+        /// Catch any errors from parsing a level file
         /// </summary>
-        public static Map TryParseFile(string file) {
-            Map map;
+        public static Level? TryParseFile(string file) {
+            Level? level = null;
             try {
-                map = ParseFile(file);
+                level = ParseFile(file);
             } catch (Exception e) {
                 Console.WriteLine("Cannot parse level file, please make sure that the file is correctly formatted or choose another level.");
                 Console.WriteLine("Error: " + e);
                 Environment.Exit(0);
-                map = ParseFile(Path.Combine("Assets", "Levels", "empty.txt"));
             }
-            return map;
+            return level;
         }
     }
 }

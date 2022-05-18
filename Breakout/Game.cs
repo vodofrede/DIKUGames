@@ -14,7 +14,12 @@ namespace Breakout {
 
         public Game(WindowArgs windowArgs) : base(windowArgs) {
             eventBus = new EventBus();
-            stateMachine = new StateMachine();
+            stateMachine = new StateMachine(eventBus);
+
+            stateMachine.AddState(new MainMenu(eventBus));
+            stateMachine.AddState(new GameRunning(eventBus));
+            stateMachine.AddState(new GamePaused(eventBus));
+            stateMachine.AddState(new GameOver(eventBus));
 
             // event bus
             eventBus.Subscribe(GameEventType.WindowEvent, this);
@@ -44,7 +49,7 @@ namespace Breakout {
         /// Set the key handler
         /// </summary>
         private void KeyHandler(KeyboardAction action, KeyboardKey key) {
-            stateMachine.ActiveState.HandleKeyEvent(action, key);
+            stateMachine.ActiveState?.HandleKeyEvent(action, key);
         }
 
         /// <summary>
@@ -52,7 +57,7 @@ namespace Breakout {
         /// </summary>
         public override void Render() {
             window.Clear();
-            stateMachine.ActiveState.RenderState();
+            stateMachine.ActiveState?.RenderState();
         }
 
         /// <summary>
@@ -60,8 +65,8 @@ namespace Breakout {
         /// </summary>
         public override void Update() {
             window.PollEvents();
-            BreakoutBus.EventBus.ProcessEventsSequentially();
-            stateMachine.ActiveState.UpdateState();
+            eventBus.ProcessEventsSequentially();
+            stateMachine.ActiveState?.UpdateState();
         }
     }
 }

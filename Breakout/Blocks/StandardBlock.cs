@@ -2,7 +2,7 @@ using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 using DIKUArcade.Math;
 
-namespace Breakout.Block {
+namespace Breakout.Blocks {
     public class StandardBlock : Entity {
         protected const float HORIZONTALBLOCKS = 12f;
         protected const float VERTICALBLOCKS = 25f;
@@ -32,7 +32,7 @@ namespace Breakout.Block {
         /// Update the block
         /// </summary>
         public virtual void Update() {
-            
+
         }
 
         /// <summary>

@@ -19,7 +19,7 @@ public class TestFileLoader {
 
         // if any level fails to parse, this test will fail because an exception will be thrown.
         foreach (string level in levels) {
-            FileLoader.ParseFile(Path.Combine("Assets", "Levels", level));
+            LevelLoader.ParseFile(Path.Combine("Assets", "Levels", level));
         }
 
         Assert.Pass();
@@ -28,7 +28,7 @@ public class TestFileLoader {
     [Test]
     public void TestMapParsedCorrectly() {
         // this test satisfies R.2
-        Map map = FileLoader.ParseFile(Path.Combine("Assets", "Levels", "level2.txt"));
+        Level map = LevelLoader.ParseFile(Path.Combine("Assets", "Levels", "level2.txt"));
 
         Assert.AreEqual("LEVEL 2", map.GetName());
         Assert.AreEqual(180, map.GetTimeLimit());
@@ -40,7 +40,7 @@ public class TestFileLoader {
     [Test]
     public void TestEmptyFiles() {
         // this test satisfies R.3
-        FileLoader.TryParseFile(Path.Combine("Assets", "Levels", "level2.txt"));
+        LevelLoader.TryParseFile(Path.Combine("Assets", "Levels", "level2.txt"));
 
         Assert.Pass();
     }

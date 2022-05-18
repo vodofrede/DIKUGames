@@ -9,37 +9,34 @@ using DIKUArcade.Timers;
 
 namespace Breakout {
     public class GameRunning : IGameState, IGameEventProcessor {
-        private static GameRunning? instance;
-
         // constants
         private const int LIVES = 3;
         private const float SPEEDINCREASE = 0.003f;
         private const float MAXIMUM_ANGLE = 5 * MathF.PI / 12;
         private const float INITIAL_BALLSPEED = 0.01f;
 
-        // state
+        // fields
+        private EventBus eventBus;
+        private LevelLoader levelLoader;
         private Score score;
         private int lives = LIVES;
         private float speedIncrease = SPEEDINCREASE;
         private float ballSpeed = INITIAL_BALLSPEED;
         private Text livesLeftText;
         private bool invincible = false;
-
-        // contained entities
         private long levelTimeLimit;
         private long levelStartTime;
         private long levelCurrentTime;
+
+        // entities
         private Player player;
-        private GameOver gameOver;
-        private Map? map;
+        private Level? map;
         private Ball ball;
         private EntityContainer<PowerUp> PowerUps;
 
-        private GameEventBus eventBus = BreakoutBus.GetBus();
-        private FileLoader fileLoader = FileLoader.GetInstance();
-
-        public GameRunning() {
-            gameOver = (GameOver)GameOver.GetInstance();
+        public GameRunning(EventBus eventBus) {
+            this.eventBus = eventBus;
+            levelLoader = new LevelLoader();
 
             // game entities
             player = new Player(new Image(Path.Combine("Assets", "Images", "player.png")));

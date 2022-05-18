@@ -6,25 +6,46 @@ using DIKUArcade.Math;
 using DIKUArcade.State;
 
 namespace Breakout.BreakoutStates {
+    enum MenuButton {
+        Play,
+        Exit
+    }
+
+    static class MenuButtonExt {
+        public static MenuButton Prev(this MenuButton button) {
+            var index = (int)button;
+            return (MenuButton)Math.Max(0, index - 1);
+        }
+
+        public static MenuButton Next(this MenuButton button) {
+            var all = typeof(MenuButton).GetEnumValues();
+            var index = (int)button;
+            return (MenuButton)Math.Min(all.Length - 1, index + 1);
+        }
+    }
+
     public class MainMenu : IGameState {
+        private EventBus eventBus;
 
-        private static MainMenu? instance;
-
-        private readonly Entity backGroundImage = new(
-            new DynamicShape(new Vec2F(0.45f, 0.1f), new Vec2F(1.0f, 1.0f)),
+        private Entity backgroundImage = new(
+            new DynamicShape(new Vec2F(-1.0f, -1.0f), new Vec2F(2.0f, 2.0f)),
             new Image(Path.Combine("Assets", "Images", "SpaceBackground.png"))
         );
-        private readonly Text[] menuButtons = new Text[] {
+        private List<Text> buttons = new() {
             new Text(string.Format("New Game"), new Vec2F(0.5f, 0.5f), new Vec2F(0.2f, 0.2f)),
             new Text(string.Format("Quit"), new Vec2F(0.5f, 0.4f), new Vec2F(0.2f, 0.2f))
         };
-        private int activeMenuButton;
 
-        /// <summary>
-        /// Get the singleton instance
-        /// </summary>
-        public static IGameState GetInstance() {
-            return instance ?? (instance = new MainMenu());
+        private MenuButton activeMenuButton;
+
+        public MainMenu(EventBus eventBus) {
+            this.eventBus = eventBus;
+            activeMenuButton = MenuButton.Play;
+
+            // workaround DIKUArcade bug
+            foreach (var button in buttons) {
+                button.SetFontSize(1000);
+            }
         }
 
         /// <summary>
@@ -32,47 +53,35 @@ namespace Breakout.BreakoutStates {
         /// </summary>
         public void RenderState() {
             // render background image
-            backGroundImage.RenderEntity();
+            backgroundImage.RenderEntity();
 
-            // render menu buttons
-            for (int i = 0; i < menuButtons.Length; i++) {
-
-                if (i == activeMenuButton) {
-                    menuButtons[i].SetColor(new Vec3I(255, 0, 0));
-                } else {
-                    menuButtons[i].SetColor(new Vec3I(255, 255, 255));
-                }
-
-                menuButtons[i].SetFontSize(1000);
-                menuButtons[i].RenderText();
+            foreach (var button in buttons) {
+                button.RenderText();
             }
         }
 
+        private void UpdateTextColor() {
+            // render menu buttons
+            for (int i = 0; i < buttons.Count; i++) {
+                if (i == (int)activeMenuButton) {
+                    buttons[i].SetColor(new Vec3I(255, 0, 0));
+                } else {
+                    buttons[i].SetColor(new Vec3I(255, 255, 255));
+                }
+            }
+        }
 
         /// <summary>
         /// Reset the State
         /// </summary>
         public void ResetState() {
-
+            activeMenuButton = MenuButton.Play;
         }
 
         /// <summary>
         /// Update the State
         /// </summary>
-        public void UpdateState() {
-            for (int i = 0; i < menuButtons.Length; i++) {
-                menuButtons[i].SetFontSize(3000);
-                if (i == activeMenuButton) {
-                    menuButtons[i].SetColor(new Vec3I(255, 0, 0));
-                } else {
-                    menuButtons[i].SetColor(new Vec3I(255, 255, 255));
-                }
-
-                menuButtons[i].RenderText();
-            }
-
-
-        }
+        public void UpdateState() { }
 
         /// <summary>
         /// Handle Key Events
@@ -80,63 +89,47 @@ namespace Breakout.BreakoutStates {
         public void HandleKeyEvent(KeyboardAction action, KeyboardKey key) {
             switch (action) {
                 case KeyboardAction.KeyPress:
-                    KeyPress(key);
-                    break;
-                case KeyboardAction.KeyRelease:
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Key Press Handler
-        /// </summary>
-        public void KeyPress(KeyboardKey keyboardKey) {
-            switch (keyboardKey) {
-                case KeyboardKey.Escape:
-                    BreakoutBus.GetBus().RegisterEvent(new GameEvent {
-                        EventType = GameEventType.WindowEvent,
-                        From = this,
-                        Message = "CLOSE_WINDOW"
-                    });
-                    break;
-
-                case KeyboardKey.Up:
-                    if (activeMenuButton < menuButtons.Length - 1) {
-                        activeMenuButton++;
-                    } else {
-                        activeMenuButton = 0;
-                    }
-                    UpdateState();
-                    break;
-
-                case KeyboardKey.Down:
-                    if (activeMenuButton > 0) {
-                        activeMenuButton--;
-                    } else {
-                        activeMenuButton = menuButtons.Length - 1;
-                    }
-                    UpdateState();
-                    break;
-
-                case KeyboardKey.Enter:
-                    if (activeMenuButton == 0) {
-                        FileLoader.GetInstance().ResetMaps();
-                        GameRunning.GetInstance().ResetState();
-                        BreakoutBus.GetBus().RegisterEvent(
-                            new GameEvent {
-                                EventType = GameEventType.GameStateEvent,
-                                From = this,
-                                Message = "GAME_RUNNING",
-                            });
-                    } else if (activeMenuButton == 1) {
-                        BreakoutBus.GetBus().RegisterEvent(
-                            new GameEvent {
+                    switch (key) {
+                        case KeyboardKey.Escape:
+                            eventBus.RegisterEvent(new GameEvent {
                                 EventType = GameEventType.WindowEvent,
                                 From = this,
-                                Message = "CLOSE_WINDOW",
+                                Message = "CLOSE_WINDOW"
                             });
+                            break;
+                        case KeyboardKey.Up:
+                            activeMenuButton = activeMenuButton.Prev();
+                            UpdateTextColor();
+                            break;
+                        case KeyboardKey.Down:
+                            activeMenuButton = activeMenuButton.Next();
+                            UpdateTextColor();
+                            break;
+                        case KeyboardKey.Enter:
+                            switch (activeMenuButton) {
+                                case MenuButton.Play:
+                                    eventBus.RegisterEvent(new GameEvent {
+                                        EventType = GameEventType.GameStateEvent,
+                                        From = this,
+                                        Message = "RESET_STATE",
+                                        StringArg1 = "GameRunning",
+                                    });
+                                    eventBus.RegisterEvent(new GameEvent {
+                                        EventType = GameEventType.GameStateEvent,
+                                        From = this,
+                                        Message = "SWITCH_STATE",
+                                        StringArg1 = "GameRunning",
+                                    });
+                                    break;
+                                case MenuButton.Exit:
+                                    eventBus.RegisterEvent(new GameEvent {
+                                        EventType = GameEventType.WindowEvent,
+                                        From = this,
+                                        Message = "CLOSE_WINDOW",
+                                    });
+                                    break;
+                            }
+                            break;
                     }
                     break;
                 default:

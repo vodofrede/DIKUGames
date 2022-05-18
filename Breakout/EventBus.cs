@@ -3,7 +3,7 @@ using DIKUArcade.Timers;
 
 namespace Breakout {
     public class EventBus {
-        private GameEventBus eventBus;
+        protected GameEventBus eventBus;
 
         // safer wrapper around game event bus that doesn't need initialize function
         public EventBus() {

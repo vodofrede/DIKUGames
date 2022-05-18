@@ -1,6 +1,6 @@
 using DIKUArcade.Math;
 
-namespace Breakout.Block {
+namespace Breakout.Blocks {
     public class DoubleSize : StandardBlock {
         public DoubleSize(Vec2F pos, string imageName) : base(pos, imageName) {
             Hitpoints = 1;

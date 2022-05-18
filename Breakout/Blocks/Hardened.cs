@@ -2,7 +2,7 @@ using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 using DIKUArcade.Math;
 
-namespace Breakout.Block {
+namespace Breakout.Blocks {
     public class Hardened : StandardBlock {
         public Hardened(Vec2F pos, string imageName) : base(pos, imageName) {
             string altImageName = imageName.Insert(imageName.Length - 3, "-damaged");
