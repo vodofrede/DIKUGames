@@ -30,9 +30,9 @@ public class TestFileLoader {
         // this test satisfies R.2
         Level map = LevelLoader.ParseFile(Path.Combine("Assets", "Levels", "level2.txt"));
 
-        Assert.AreEqual("LEVEL 2", map.GetName());
-        Assert.AreEqual(180, map.GetTimeLimit());
-        Assert.AreEqual(72, map.GetBlocks().CountEntities());
+        Assert.AreEqual("LEVEL 2", map.Name);
+        Assert.AreEqual(180, map.TimeLimit);
+        Assert.AreEqual(72, map.Blocks.CountEntities());
 
         Assert.Pass();
     }

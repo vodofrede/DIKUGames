@@ -6,7 +6,7 @@ namespace Breakout {
     public class Ball : Entity {
         // associated constants
         private const float DIAMETER = 0.05f;
-        private const float SPEED = 0.01f;
+        private const float SPEED = 0.008f;
         private const string IMAGE = "ball.png";
 
         // properties
@@ -26,7 +26,7 @@ namespace Breakout {
 
         // constructors
         public Ball(Vec2F position) : base(new DynamicShape(position, new Vec2F(DIAMETER, DIAMETER)), new Image(Path.Combine("Assets", "Images", IMAGE))) {
-            Velocity = new Vec2F(SPEED, SPEED);
+            Velocity = new Vec2F(0.1f * SPEED, 0.8f * SPEED);
         }
 
         /// <summary>

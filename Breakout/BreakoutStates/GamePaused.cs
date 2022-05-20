@@ -5,71 +5,58 @@ using DIKUArcade.Input;
 using DIKUArcade.Math;
 using DIKUArcade.State;
 
-namespace Breakout {
+namespace Breakout.BreakoutStates {
     public class GamePaused : IGameState {
-        private static GamePaused? instance;
+        private EventBus eventBus;
 
-        private readonly Entity backGroundImage = new(
-            new DynamicShape(new Vec2F(0.45f, 0.1f), new Vec2F(1.0f, 1.0f)),
+        private Entity backGroundImage = new(
+            new DynamicShape(new Vec2F(-1.0f, -1.0f), new Vec2F(2.0f, 2.0f)),
             new Image(Path.Combine("Assets", "Images", "SpaceBackground.png"))
         );
 
-        private readonly Text[] menuButtons = new Text[] {
-            new Text(string.Format("Continue"), new Vec2F(0.5f, 0.6f), new Vec2F(0.2f, 0.2f)),
-            new Text(string.Format("Main Menu"), new Vec2F(0.5f, 0.5f), new Vec2F(0.2f, 0.2f)),
-            new Text(string.Format("Quit"), new Vec2F(0.5f, 0.4f), new Vec2F(0.2f, 0.2f))
-        };
+        private TextDisplay menuButtons = new();
+        private GamePausedButton activeMenuButton = GamePausedButton.Continue;
+        private List<Action> behaviors = new();
 
-        private int activeMenuButton = 0;
+        public GamePaused(EventBus eventBus) {
+            this.eventBus = eventBus;
 
-        /// <summary>
-        /// Get the singleton instance of the MainMenu
-        /// </summary>
-        public static IGameState GetInstance() {
-            return instance ?? (instance = new GamePaused());
+            // buttons
+            var continueButton = new TextField(() => "Continue", new Vec2F(0.2f, 0.6f), new Vec2F(0.2f, 0.2f));
+            menuButtons.AddTextField(continueButton);
+            var mainMenuButton = new TextField(() => "Main Menu", new Vec2F(0.2f, 0.5f), new Vec2F(0.2f, 0.2f));
+            menuButtons.AddTextField(mainMenuButton);
+            var exitButton = new TextField(() => "Exit", new Vec2F(0.2f, 0.4f), new Vec2F(0.2f, 0.2f));
+            menuButtons.AddTextField(exitButton);
+
+            // behaviors
+            behaviors.Add(() => _ = activeMenuButton == GamePausedButton.Continue ? continueButton.SetColor(255, 0, 0) : continueButton.SetColor(255, 255, 255));
+            behaviors.Add(() => _ = activeMenuButton == GamePausedButton.MainMenu ? mainMenuButton.SetColor(255, 0, 0) : mainMenuButton.SetColor(255, 255, 255));
+            behaviors.Add(() => _ = activeMenuButton == GamePausedButton.Exit ? exitButton.SetColor(255, 0, 0) : exitButton.SetColor(255, 255, 255));
         }
 
         /// <summary>
-        /// Render the Game State
+        /// RenderText the Game State
         /// </summary>
         public void RenderState() {
             // render background image
             backGroundImage.RenderEntity();
-
-            // render menu buttons
-            for (int i = 0; i < menuButtons.Length; i++) {
-
-                if (i == activeMenuButton) {
-                    menuButtons[i].SetColor(new Vec3I(255, 0, 0));
-                } else {
-                    menuButtons[i].SetColor(new Vec3I(255, 255, 255));
-                }
-
-                menuButtons[i].SetFontSize(3000);
-                menuButtons[i].RenderText();
-            }
-            // continue or quit
+            menuButtons.RenderText();
         }
 
         /// <summary>
         /// Reset the Game State
         /// </summary>
         public void ResetState() {
-
+            activeMenuButton = GamePausedButton.Continue;
         }
 
         /// <summary>
         /// Update the Game State
         /// </summary>
         public void UpdateState() {
-            for (int i = 0; i < menuButtons.Length; i++) {
-                if (i == activeMenuButton) {
-                    menuButtons[i].SetColor(new Vec3I(255, 0, 0));
-                } else {
-                    menuButtons[i].SetColor(new Vec3I(255, 255, 255));
-                }
-
-                menuButtons[i].RenderText();
+            foreach (var behavior in behaviors) {
+                behavior();
             }
         }
 
@@ -79,73 +66,55 @@ namespace Breakout {
         public void HandleKeyEvent(KeyboardAction keyboardAction, KeyboardKey keyboardKey) {
             switch (keyboardAction) {
                 case KeyboardAction.KeyPress:
-                    KeyPress(keyboardKey);
-                    break;
-                case KeyboardAction.KeyRelease:
+                    switch (keyboardKey) {
+                        case KeyboardKey.Escape:
+                            eventBus.RegisterEvent(GameEventType.WindowEvent, this, "CLOSE_WINDOW");
+                            break;
+                        case KeyboardKey.Up:
+                            activeMenuButton = activeMenuButton.Prev();
+                            break;
+                        case KeyboardKey.Down:
+                            activeMenuButton = activeMenuButton.Next();
+                            break;
+                        case KeyboardKey.Enter:
+                            switch (activeMenuButton) {
+                                case GamePausedButton.Continue:
+                                    eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SWITCH_STATE", "GameRunning");
+                                    break;
+                                case GamePausedButton.MainMenu:
+                                    eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SWITCH_STATE", "MainMenu");
+                                    break;
+                                case GamePausedButton.Exit:
+                                    eventBus.RegisterEvent(GameEventType.WindowEvent, this, "CLOSE_WINDOW");
+                                    break;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
                     break;
                 default:
                     break;
             }
         }
+    }
 
-        /// <summary>
-        /// Key Press Handler
-        /// </summary>
-        public void KeyPress(KeyboardKey keyboardKey) {
-            switch (keyboardKey) {
-                case KeyboardKey.Escape:
-                    BreakoutBus.GetBus().RegisterEvent(new GameEvent {
-                        EventType = GameEventType.WindowEvent,
-                        From = this,
-                        Message = "CLOSE_WINDOW"
-                    });
-                    break;
+    enum GamePausedButton {
+        Continue,
+        MainMenu,
+        Exit,
+    }
 
-                case KeyboardKey.Down:
-                    if (activeMenuButton < menuButtons.Length - 1) {
-                        activeMenuButton++;
-                    } else {
-                        activeMenuButton = 0;
-                    }
-                    UpdateState();
-                    break;
+    static class MenuButtonExt {
+        public static GamePausedButton Prev(this GamePausedButton button) {
+            var index = (int)button;
+            return (GamePausedButton)Math.Max(0, index - 1);
+        }
 
-                case KeyboardKey.Up:
-                    if (activeMenuButton > 0) {
-                        activeMenuButton--;
-                    } else {
-                        activeMenuButton = menuButtons.Length - 1;
-                    }
-                    UpdateState();
-                    break;
-
-                case KeyboardKey.Enter:
-                    if (activeMenuButton == 0) {
-                        BreakoutBus.GetBus().RegisterEvent(
-                            new GameEvent {
-                                EventType = GameEventType.GameStateEvent,
-                                From = this,
-                                Message = "GAME_RUNNING",
-                            });
-                    } else if (activeMenuButton == 1) {
-                        BreakoutBus.GetBus().RegisterEvent(
-                            new GameEvent {
-                                EventType = GameEventType.GameStateEvent,
-                                From = this,
-                                Message = "MAIN_MENU",
-                            });
-                    } else if (activeMenuButton == 2) {
-                        BreakoutBus.GetBus().RegisterEvent(
-                            new GameEvent {
-                                EventType = GameEventType.WindowEvent,
-                                From = this,
-                                Message = "CLOSE_WINDOW",
-                            });
-                    }
-                    break;
-                default:
-                    break;
-            }
+        public static GamePausedButton Next(this GamePausedButton button) {
+            var all = typeof(GamePausedButton).GetEnumValues();
+            var index = (int)button;
+            return (GamePausedButton)Math.Min(all.Length - 1, index + 1);
         }
     }
 }

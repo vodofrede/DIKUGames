@@ -8,14 +8,14 @@ namespace Breakout {
         public int TimeLimit { get; private set; }
         public EntityContainer<Block> Blocks { get; private set; }
 
-        public Level(string name, int timeLimit, EntityContainer<Block> blocks) {
+        public Level(string name, int? timeLimit, EntityContainer<Block> blocks) {
             Name = name;
-            TimeLimit = timeLimit;
+            TimeLimit = timeLimit ?? 300;
             Blocks = blocks;
         }
 
         /// <summary>
-        /// Render the current map
+        /// RenderText the current level
         /// </summary>
         public void Render() {
             Blocks.RenderEntities();

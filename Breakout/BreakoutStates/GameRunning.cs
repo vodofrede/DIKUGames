@@ -1,3 +1,4 @@
+using Breakout.Blocks;
 using DIKUArcade.Entities;
 using DIKUArcade.Events;
 using DIKUArcade.Graphics;
@@ -7,295 +8,249 @@ using DIKUArcade.Physics;
 using DIKUArcade.State;
 using DIKUArcade.Timers;
 
-namespace Breakout {
+namespace Breakout.BreakoutStates {
     public class GameRunning : IGameState, IGameEventProcessor {
         // constants
         private const int LIVES = 3;
         private const float SPEEDINCREASE = 0.003f;
         private const float MAXIMUM_ANGLE = 5 * MathF.PI / 12;
         private const float INITIAL_BALLSPEED = 0.01f;
+        private const int TIME_LIMIT = 300;
 
         // fields
         private EventBus eventBus;
-        private LevelLoader levelLoader;
-        private Score score;
-        private int lives = LIVES;
-        private float speedIncrease = SPEEDINCREASE;
-        private float ballSpeed = INITIAL_BALLSPEED;
-        private Text livesLeftText;
-        private bool invincible = false;
-        private long levelTimeLimit;
-        private long levelStartTime;
-        private long levelCurrentTime;
+        private LevelLoader levelLoader = new();
 
-        // entities
+        // game variables
+        private int lives = LIVES;
+        private int score = 0;
+        private bool invincible = false;
+        private float ballSpeed = INITIAL_BALLSPEED;
+        private float speedIncrease = SPEEDINCREASE;
         private Player player;
-        private Level? map;
+        private Level? level;
         private Ball ball;
-        private EntityContainer<PowerUp> PowerUps;
+        private EntityContainer<PowerUp> powerUps = new();
+        private TextDisplay textDisplay = new();
+        private int startTime = (int)Math.Floor(StaticTimer.GetElapsedSeconds());
 
         public GameRunning(EventBus eventBus) {
             this.eventBus = eventBus;
-            levelLoader = new LevelLoader();
 
-            // game entities
+            eventBus.Subscribe(GameEventType.TimedEvent, this);
+
+            // player setup
             player = new Player(new Image(Path.Combine("Assets", "Images", "player.png")));
             eventBus.Subscribe(GameEventType.PlayerEvent, player);
             eventBus.Subscribe(GameEventType.TimedEvent, this);
 
+            // other entities
             ball = new Ball(new Vec2F(0.5f, 0.15f));
-            map = fileLoader.NextMap();
-            score = new Score(new Vec2F(0.8f, 0.8f), new Vec2F(0.2f, 0.2f));
+            level = levelLoader.Next();
 
-            // livesLeftText
-            livesLeftText = new Text("Lives left: " + lives, new Vec2F(0.2f, 0.8f), new Vec2F(0.2f, 0.2f));
-            livesLeftText.SetFontSize(1000);
-            livesLeftText.SetColor(new Vec3I(0, 128, 255));
-
-            PowerUps = new EntityContainer<PowerUp>();
-            levelStartTime = StaticTimer.GetElapsedMilliseconds();
-            levelTimeLimit = map.GetTimeLimit();
+            // on-screen text
+            textDisplay.AddTextField(new TextField(() => "Lives left: " + lives, new Vec2F(0.2f, 0.8f), new Vec2F(0.2f, 0.2f)));
+            textDisplay.AddTextField(new TextField(() => "score: " + score, new Vec2F(0.8f, 0.8f), new Vec2F(0.2f, 0.2f)));
+            textDisplay.AddTextField(new TextField(() => "Time left: " + TimeLeft() + "s", new Vec2F(0.8f, 0.2f), new Vec2F(0.2f, 0.2f)));
         }
 
         /// <summary>
-        /// Get the singleton instance
-        /// </summary>
-        public static IGameState GetInstance() {
-            return instance ??= new GameRunning();
-        }
-
-        /// <summary>
-        /// Render State 
+        /// RenderText State 
         /// </summary>
         public void RenderState() {
             player.RenderEntity();
-            map?.RenderMap();
-            PowerUps.RenderEntities();
+            level?.Render();
             ball.RenderEntity();
-            score.RenderScore();
-            livesLeftText.RenderText();
+            powerUps.RenderEntities();
+            textDisplay.RenderText();
         }
-
 
         /// <summary>
         /// Reset State
         /// </summary>
         public void ResetState() {
+            levelLoader = new();
+            level = levelLoader.Next();
+
             player = new Player(new Image(Path.Combine("Assets", "Images", "player.png")));
             eventBus.Subscribe(GameEventType.PlayerEvent, player);
+
             ball = new Ball(new Vec2F(0.5f, 0.15f));
             ballSpeed = INITIAL_BALLSPEED;
-            map = fileLoader.NextMap();
-            score = new Score(new Vec2F(0.8f, 0.8f), new Vec2F(0.2f, 0.2f));
+            speedIncrease = SPEEDINCREASE;
+
+            powerUps = new();
+            startTime = (int)Math.Floor(StaticTimer.GetElapsedSeconds());
+
             lives = LIVES;
-            livesLeftText.SetText("Lives left: " + lives);
+        }
+
+        private int TimeLeft() {
+            var elapsed = (int)Math.Floor(StaticTimer.GetElapsedSeconds()) - startTime;
+            return (level?.TimeLimit - elapsed) ?? 300;
         }
 
         /// <summary>
         /// Update State
         /// </summary>
         public void UpdateState() {
-            levelCurrentTime = StaticTimer.GetElapsedMilliseconds();
-            bool timeExpired = levelCurrentTime - levelStartTime > levelTimeLimit;
-            Console.WriteLine("Level start time: " + levelStartTime);
-            Console.WriteLine("Level time limit: " + levelTimeLimit);
-            Console.WriteLine("Level current time: " + levelCurrentTime);
-            Console.WriteLine("Time Expired: " + timeExpired);
-            if (lives > 0 && map == null) {
-                // entire game is won
-                // go to game over menu
-                fileLoader.ResetMaps();
-                gameOver.WonGame = true;
-                // gameOver.Score = score.Points;
-                // WonGame = false;
-                eventBus.RegisterEvent(new GameEvent {
-                    EventType = GameEventType.GameStateEvent,
-                    From = this,
-                    Message = "GAME_OVER"
-                });
-            } else if (lives == 0 || timeExpired) {
-                // gameOver.Score = score.Points;
-                // level is lost
-                // go to game over menu
-                fileLoader.ResetMaps();
-                eventBus.RegisterEvent(new GameEvent {
-                    EventType = GameEventType.GameStateEvent,
-                    From = this,
-                    Message = "GAME_OVER"
-                });
-            } else {
-                eventBus.ProcessEventsSequentially();
-
-                // game is running
-                map?.GetBlocks().Iterate(block => block.Update());
-                PowerUps.Iterate(powerUp => {
-                    powerUp.Update();
-                    var dynamic = powerUp.Shape.AsDynamicShape();
-                    dynamic.Direction.X = 0.0f;
-                    dynamic.Direction.Y = -0.01f;
-                    if (CollisionDetection.Aabb(dynamic, player.Shape).Collision) {
-                        switch (powerUp.Effect) {
-                            case "ExtraLife":
-                                lives++;
-                                powerUp.DeleteEntity();
-                                break;
-                            case "WidePowerUp":
-                                if (player.Shape.Extent.X < 0.4f) player.Shape.ScaleXFromCenter(2f);
-                                eventBus.RegisterTimedEvent(new GameEvent {
-                                    EventType = GameEventType.PlayerEvent,
-                                    From = this,
-                                    To = this,
-                                    Message = "WIDE_STOP"
-                                }, TimePeriod.NewMilliseconds(5000));
-                                powerUp.DeleteEntity();
-                                break;
-                            case "SpeedPowerUp":
-                                if (player.MovementSpeed < 0.08) player.MovementSpeed = Player.MOVEMENT_SPEED * 1.5f;
-                                eventBus.RegisterTimedEvent(new GameEvent {
-                                    EventType = GameEventType.PlayerEvent,
-                                    From = this,
-                                    To = this,
-                                    Message = "SPEED_STOP"
-                                }, TimePeriod.NewMilliseconds(5000));
-                                powerUp.DeleteEntity();
-                                break;
-                            case "Invincible":
-                                invincible = true;
-                                eventBus.RegisterTimedEvent(new GameEvent {
-                                    EventType = GameEventType.PlayerEvent,
-                                    From = this,
-                                    To = this,
-                                    Message = "INVINCIBLE_STOP"
-                                }, TimePeriod.NewMilliseconds(5000));
-                                powerUp.DeleteEntity();
-                                break;
-                            case "DoubleSize":
-                                if (ball.Shape.Extent.X < 0.41f) ball.Shape.ScaleFromCenter(2f);
-                                eventBus.RegisterTimedEvent(new GameEvent {
-                                    EventType = GameEventType.PlayerEvent,
-                                    From = this,
-                                    To = this,
-                                    Message = "DOUBLE_SIZE_STOP"
-                                }, TimePeriod.NewMilliseconds(5000));
-                                powerUp.DeleteEntity();
-                                break;
-                            default:
-                                powerUp.DeleteEntity();
-                                break;
-                        }
-                    }
-                    if (powerUp.Shape.Position.Y < -1.0f) {
-                        powerUp.DeleteEntity();
-                    }
-                });
-
-                player.Move();
-                if (ball.Move()) {
-                    ball = new Ball(new Vec2F(0.5f, 0.5f));
-                    if (!invincible) lives--;
-                }
-
-                DynamicShape dynamicBall = ball.Shape.AsDynamicShape();
-                dynamicBall.Direction.X = ball.Velocity.X;
-                dynamicBall.Direction.Y = ball.Velocity.Y;
-
-                var paddleCollision = CollisionDetection.Aabb(dynamicBall, player.Shape);
-                if (paddleCollision.Collision && ball.Velocity.Y < 0.0f) {
-                    // finding middle of player shape
-                    float playerMiddleX = player.Shape.Position.X + player.Shape.Extent.X / 2f;
-                    // subtracting balls position to find relative impact (where on the player it hits)
-                    // this value is -+ extent / 2 (in our case from -0.1f to 0.1f)
-                    float relativeImpactPosition = playerMiddleX - dynamicBall.Position.X;
-                    // normalizing to get value from -1 to 1
-                    float normalizedRelativeImpact = relativeImpactPosition * 10;
-                    // calculating angle based on relative impact and max angle
-                    float bounceAngle = normalizedRelativeImpact * MAXIMUM_ANGLE;
-
-                    // setting new x,y velocity
-                    ball.Velocity.Y = ballSpeed * MathF.Cos(bounceAngle);
-                    ball.Velocity.X = ballSpeed * -MathF.Sin(bounceAngle);
-                }
-
-                map?.GetBlocks().Iterate(block => {
-                    var blockCollision = CollisionDetection.Aabb(dynamicBall, block.Shape);
-
-                    if (blockCollision.Collision) {
-                        if (score.Points != 0 && score.Points % 10 == 0) {
-                            ballSpeed += speedIncrease;
-                        }
-
-                        Vec2F blockPosition = block.Shape.Position;
-                        var effect = block.DecreaseHitpoints();
-                        switch (effect) {
-                            case "Destroy":
-                                block.DeleteEntity();
-                                score.AddPoints(block.Value);
-                                break;
-                            case "Hungry":
-                                ball = new Ball(new Vec2F(0.5f, 0.15f));
-                                block.DeleteEntity();
-                                score.AddPoints(block.Value);
-                                break;
-                            case "ExtraLife":
-                                PowerUp extraLife = new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "heart_filled.png")), "ExtraLife");
-                                PowerUps.AddEntity(extraLife);
-                                block.DeleteEntity();
-                                break;
-                            case "WidePowerUp":
-                                PowerUp widePowerUp = new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "WidePowerUp.png")), "WidePowerUp");
-                                PowerUps.AddEntity(widePowerUp);
-                                block.DeleteEntity();
-                                break;
-                            case "DoubleSize":
-                                PowerUp doubleSize = new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "BigPowerUp.png")), "DoubleSize");
-                                PowerUps.AddEntity(doubleSize);
-                                block.DeleteEntity();
-                                break;
-                            case "Invincible":
-                                PowerUp invincible = new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "InfinitePowerUp.png")), "Invincible");
-                                PowerUps.AddEntity(invincible);
-                                block.DeleteEntity();
-                                break;
-                            case "SpeedPowerUp":
-                                PowerUp speedPowerUp = new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "DoubleSpeedPowerUp.png")), "SpeedPowerUp");
-                                PowerUps.AddEntity(speedPowerUp);
-                                block.DeleteEntity();
-                                break;
-                            default:
-                                throw new NotImplementedException();
-                        }
-
-                        switch (blockCollision.CollisionDir) {
-                            case CollisionDirection.CollisionDirDown:
-                            case CollisionDirection.CollisionDirUp:
-                                ball.Velocity.Y = -ball.Velocity.Y;
-                                break;
-                            case CollisionDirection.CollisionDirLeft:
-                            case CollisionDirection.CollisionDirRight:
-                                ball.Velocity.X = -ball.Velocity.X;
-                                break;
-                            case CollisionDirection.CollisionDirUnchecked:
-                                break;
-                        }
-                    };
-
-
-                });
-
-                bool anyBlocksLeft = false;
-                map?.GetBlocks().Iterate(block => {
-                    if (block.Type != "Unbreakable") {
-                        anyBlocksLeft = true;
-                    }
-                });
-                if (!anyBlocksLeft) {
-                    // next level
-                    map = fileLoader.NextMap();
-                    ResetState();
-                }
-
+            // early returns
+            if (lives <= 0 || TimeLeft() <= 0) {
+                // game has been lost
+                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SET_STATE", "GameOver", new { Score = score, Status = "GAME_LOST" });
+                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SWITCH_STATE", "GameOver");
             }
-            livesLeftText.SetText("Lives left: " + lives);
+            if (level == null) {
+                // game has been won
+                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SET_STATE", "GameOver", new { Score = score, Status = "GAME_WON" });
+                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SWITCH_STATE", "GameOver");
+            }
+            // load next map if no blocks are left
+            bool anyBlocksLeft = false;
+            level?.Blocks.Iterate(block => {
+                if (block.IsBreakable()) {
+                    anyBlocksLeft = true;
+                }
+            });
+            if (!anyBlocksLeft) {
+                // next level, we cant reset fully as we need to keep levelLoader state.
+                level = levelLoader.Next();
+
+                player = new Player(new Image(Path.Combine("Assets", "Images", "player.png")));
+                eventBus.Subscribe(GameEventType.PlayerEvent, player);
+
+                ball = new Ball(new Vec2F(0.5f, 0.15f));
+                ballSpeed = INITIAL_BALLSPEED;
+                speedIncrease = SPEEDINCREASE;
+
+                powerUps = new();
+
+                startTime = (int)Math.Floor(StaticTimer.GetElapsedSeconds());
+            }
+
+            eventBus.ProcessEventsSequentially();
+
+            // process powerups
+            powerUps.Iterate(powerUp => {
+                powerUp.Update();
+                var dynamic = powerUp.Shape.AsDynamicShape();
+                dynamic.Direction.X = 0.0f;
+                dynamic.Direction.Y = -0.01f;
+                if (CollisionDetection.Aabb(dynamic, player.Shape).Collision) {
+                    powerUp.Effect();
+                    powerUp.DeleteEntity();
+                }
+                if (powerUp.Shape.Position.Y < -1.0f) {
+                    powerUp.DeleteEntity();
+                }
+            });
+
+            player.Move();
+            if (ball.Move()) {
+                // ball has gone off the bottom of the screen
+                ball = new Ball(new Vec2F(0.5f, 0.15f));
+                if (!invincible) lives--;
+            }
+
+            // check for collision between paddle and ball
+            DynamicShape dynamicBall = ball.Shape.AsDynamicShape();
+            dynamicBall.Direction.X = ball.Velocity.X;
+            dynamicBall.Direction.Y = ball.Velocity.Y;
+
+            var paddleCollision = CollisionDetection.Aabb(dynamicBall, player.Shape);
+            if (paddleCollision.Collision && ball.Velocity.Y < 0.0f) {
+                // finding middle of player shape
+                float playerMiddleX = player.Shape.Position.X + player.Shape.Extent.X / 2f;
+                // subtracting balls position to find relative impact (where on the player it hits)
+                // this value is -+ extent / 2 (in our case from -0.1f to 0.1f)
+                float relativeImpactPosition = playerMiddleX - dynamicBall.Position.X;
+                // normalizing to get value from -1 to 1
+                float normalizedRelativeImpact = relativeImpactPosition * 10;
+                // calculating angle based on relative impact and max angle
+                float bounceAngle = normalizedRelativeImpact * MAXIMUM_ANGLE;
+
+                // setting new x,y velocity
+                ball.Velocity.Y = ballSpeed * MathF.Cos(bounceAngle);
+                ball.Velocity.X = ballSpeed * -MathF.Sin(bounceAngle);
+            }
+
+            // check for collision between ball and blocks
+            bool ballDirChanged = false;
+            level?.Blocks.Iterate(block => {
+                var blockCollision = CollisionDetection.Aabb(dynamicBall, block.Shape);
+                if (blockCollision.Collision) {
+                    // increase speed if score is multiple of 10 
+                    // or score + 1, since it is possible to destroy multiple blocks at once
+                    if (score != 0 && (score % 10 == 0 || score + 1 % 10 == 0)) {
+                        ballSpeed += speedIncrease;
+                        Console.WriteLine("Speed increased");
+                    }
+
+                    // apply effect
+                    Vec2F blockPosition = block.Shape.Position;
+                    switch (block.OnHit()) {
+                        case BlockAction.None: break;
+                        case BlockAction.Destroy:
+                            switch (block.Effect) {
+                                case "None": break;
+                                case "Hungry":
+                                    ball = new Ball(new Vec2F(0.5f, 0.15f));
+                                    break;
+                                case "ExtraLife":
+                                    powerUps.AddEntity(new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "heart_filled.png")), () => lives++));
+                                    break;
+                                case "WidePowerUp":
+                                    powerUps.AddEntity(new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "WidePowerUp.png")), () => {
+                                        player.Shape.ScaleXFromCenter(player.Shape.Extent.X < 0.4f ? 2f : 1f);
+                                        eventBus.RegisterTimedEvent(this, "WIDE_STOP", 5000);
+                                    }));
+                                    break;
+                                case "DoubleSize":
+                                    powerUps.AddEntity(new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "BigPowerUp.png")), () => {
+                                        ball.Shape.ScaleFromCenter(ball.Shape.Extent.X < 0.41f ? 2f : 1f);
+                                        eventBus.RegisterTimedEvent(this, "DOUBLE_SIZE_STOP", 5000);
+                                    })); ;
+                                    break;
+                                case "Invincible":
+                                    powerUps.AddEntity(new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "InfinitePowerUp.png")), () => {
+                                        invincible = true;
+                                        eventBus.RegisterTimedEvent(this, "INVINCIBLE_STOP", 20000);
+                                    }));
+                                    break;
+                                case "SpeedPowerUp":
+                                    powerUps.AddEntity(new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "DoubleSpeedPowerUp.png")), () => {
+                                        player.MovementSpeed = player.MovementSpeed < 0.08 ? Player.MOVEMENT_SPEED * 1.5f : player.MovementSpeed;
+                                        eventBus.RegisterTimedEvent(this, "SPEED_STOP", 5000);
+                                    }));
+                                    break;
+                                default: throw new NotImplementedException();
+                            }
+                            score += block.Value;
+                            block.DeleteEntity();
+                            break;
+                    }
+
+                    // reflect ball
+                    switch (blockCollision.CollisionDir) {
+                        case CollisionDirection.CollisionDirDown:
+                        case CollisionDirection.CollisionDirUp:
+                            if (!ballDirChanged) {
+                                ball.Velocity.Y = -ball.Velocity.Y;
+                                ballDirChanged = true;
+                            };
+                            break;
+                        case CollisionDirection.CollisionDirLeft:
+                        case CollisionDirection.CollisionDirRight:
+                            if (!ballDirChanged) {
+                                ball.Velocity.X = -ball.Velocity.X;
+                                ballDirChanged = true;
+                            }
+                            break;
+                        case CollisionDirection.CollisionDirUnchecked:
+                            break;
+                    }
+                };
+            });
         }
 
         /// <summary>
@@ -318,20 +273,10 @@ namespace Breakout {
         public void KeyPress(KeyboardKey key) {
             switch (key) {
                 case KeyboardKey.Right:
-                    BreakoutBus.GetBus().RegisterEvent(new GameEvent {
-                        EventType = GameEventType.PlayerEvent,
-                        From = this,
-                        To = player,
-                        Message = "START_MOVE_RIGHT"
-                    });
+                    eventBus.RegisterEvent(GameEventType.PlayerEvent, this, "START_MOVE_RIGHT");
                     break;
                 case KeyboardKey.Left:
-                    BreakoutBus.GetBus().RegisterEvent(new GameEvent {
-                        EventType = GameEventType.PlayerEvent,
-                        From = this,
-                        To = player,
-                        Message = "START_MOVE_LEFT"
-                    });
+                    eventBus.RegisterEvent(GameEventType.PlayerEvent, this, "START_MOVE_LEFT");
                     break;
             }
         }
@@ -341,50 +286,22 @@ namespace Breakout {
         /// </summary>
         public void KeyRelease(KeyboardKey key) {
             switch (key) {
-                case KeyboardKey.Space:
-                    // START BALL?
-                    break;
-
                 case KeyboardKey.Right:
-                    BreakoutBus.GetBus().RegisterEvent(new GameEvent {
-                        EventType = GameEventType.PlayerEvent,
-                        From = this,
-                        To = player,
-                        Message = "STOP_MOVE_RIGHT"
-                    });
+                    eventBus.RegisterEvent(GameEventType.PlayerEvent, this, "STOP_MOVE_RIGHT");
                     break;
-
                 case KeyboardKey.Left:
-                    BreakoutBus.GetBus().RegisterEvent(new GameEvent {
-                        EventType = GameEventType.PlayerEvent,
-                        From = this,
-                        To = player,
-                        Message = "STOP_MOVE_LEFT"
-                    });
+                    eventBus.RegisterEvent(GameEventType.PlayerEvent, this, "STOP_MOVE_LEFT");
                     break;
-
                 case KeyboardKey.P:
-                    BreakoutBus.GetBus().RegisterEvent(new GameEvent {
-                        EventType = GameEventType.GameStateEvent,
-                        From = this,
-                        Message = "GAME_PAUSED"
-                    });
+                    eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SWITCH_STATE", "GamePaused");
                     break;
-
                 case KeyboardKey.Escape:
-                    BreakoutBus.GetBus().RegisterEvent(new GameEvent {
-                        EventType = GameEventType.WindowEvent,
-                        From = this,
-                        Message = "CLOSE_WINDOW"
-                    });
+                    eventBus.RegisterEvent(GameEventType.WindowEvent, this, "CLOSE_WINDOW");
                     break;
             }
         }
 
         public void ProcessEvent(GameEvent gameEvent) {
-            Console.WriteLine("Got game event");
-            Console.WriteLine(gameEvent);
-
             switch (gameEvent.Message) {
                 case "WIDE_STOP":
                     player.Shape.Extent.X = 0.2f;

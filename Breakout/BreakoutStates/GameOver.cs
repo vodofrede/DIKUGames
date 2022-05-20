@@ -5,94 +5,80 @@ using DIKUArcade.Input;
 using DIKUArcade.Math;
 using DIKUArcade.State;
 
-namespace Breakout {
+namespace Breakout.BreakoutStates {
     public class GameOver : IGameState {
-        private static GameOver? instance;
-        public uint Score = 0;
-        public bool WonGame = false;
+        private EventBus eventBus;
 
-        private readonly Entity backGroundImage = new(
-            new DynamicShape(new Vec2F(0.45f, 0.1f), new Vec2F(1.0f, 1.0f)),
+        // fields
+        private uint score = 0;
+        private bool won = true;
+
+        // visuals
+        private Entity backGroundImage = new(
+            new DynamicShape(new Vec2F(-1.0f, -1.0f), new Vec2F(2.0f, 2.0f)),
             new Image(Path.Combine("Assets", "Images", "SpaceBackground.png"))
         );
 
-        // TODO: Should display if the game was won or lost and the score
-        private readonly Text gameWonText = new Text(string.Format("The game is over! You won"), new Vec2F(0.5f, 0.7f), new Vec2F(0.4f, 0.4f));
-        private readonly Text gameLostText = new Text(string.Format("The game is over! You lost"), new Vec2F(0.5f, 0.7f), new Vec2F(0.4f, 0.4f));
-            
+        private TextDisplay statusText = new();
+        private TextDisplay menuButtons = new();
+        private GameOverButton activeMenuButton = GameOverButton.MainMenu;
+        private List<Action> behaviors = new();
 
+        public GameOver(EventBus eventBus) {
+            this.eventBus = eventBus;
 
+            // status text
+            TextField headerText = new TextField(() => "Game Over!", new Vec2F(0.17f, 0.5f), new Vec2F(0.8f, 0.4f));
+            statusText.AddTextField(headerText);
+            TextField outcomeText = new TextField(() => "You " + (won ? "Won!" : "Lost!"), new Vec2F(0.18f, 0.4f), new Vec2F(0.8f, 0.4f));
+            statusText.AddTextField(outcomeText);
+            statusText.AddTextField(new TextField(() => "Your score was: " + score, new Vec2F(0.2f, 0.3f), new Vec2F(0.3f, 0.4f)));
 
-        private readonly Text[] menuButtons = new Text[] {
-            new Text(string.Format("Main Menu"), new Vec2F(0.5f, 0.5f), new Vec2F(0.2f, 0.2f)),
-            new Text(string.Format("Quit"), new Vec2F(0.5f, 0.4f), new Vec2F(0.2f, 0.2f))
-        };
+            // menu buttons
+            TextField mainMenuButton = new TextField(() => "Main Menu", new Vec2F(0.2f, 0.2f), new Vec2F(0.2f, 0.2f));
+            menuButtons.AddTextField(mainMenuButton);
+            TextField exitButton = new TextField(() => "Exit", new Vec2F(0.2f, 0.1f), new Vec2F(0.2f, 0.2f));
+            menuButtons.AddTextField(exitButton);
 
-        private int activeMenuButton = 0;
+            // behaviors
+            behaviors.Add(() => _ = won ? outcomeText.SetColor(0, 255, 0) : outcomeText.SetColor(255, 165, 0));
+            behaviors.Add(() => _ = activeMenuButton == GameOverButton.MainMenu ? mainMenuButton.SetColor(255, 0, 0) : mainMenuButton.SetColor(255, 255, 255));
+            behaviors.Add(() => _ = activeMenuButton == GameOverButton.Exit ? exitButton.SetColor(255, 0, 0) : exitButton.SetColor(255, 255, 255));
 
-        /// <summary>
-        /// Get the singleton instance of the MainMenu
-        /// </summary>
-        public static IGameState GetInstance() {
-            return instance ?? (instance = new GameOver());
         }
 
         /// <summary>
-        /// Render the Game State
+        /// RenderText the Game State
         /// </summary>
         public void RenderState() {
             // render background image
             backGroundImage.RenderEntity();
-
-            if (WonGame) {
-                gameWonText.SetColor(new Vec3I(0, 255, 0));
-                gameWonText.SetFontSize(3000);
-                gameWonText.RenderText();
-            } else {
-                gameLostText.SetColor(new Vec3I(255, 165, 0));
-                gameLostText.SetFontSize(3000);
-                gameLostText.RenderText();
-            }
-            Text scoreText = new Text(string.Format("Your score was: " + Score), new Vec2F(0.5f, 0.6f), new Vec2F(0.4f, 0.4f));
-            scoreText.SetColor(new Vec3I(138, 43, 226));
-            scoreText.SetFontSize(1000);
-            scoreText.RenderText();
-
-            // render menu buttons
-            for (int i = 0; i < menuButtons.Length; i++) {
-
-                if (i == activeMenuButton) {
-                    menuButtons[i].SetColor(new Vec3I(255, 0, 0));
-                } else {
-                    menuButtons[i].SetColor(new Vec3I(255, 255, 255));
-                }
-
-                menuButtons[i].SetFontSize(3000);
-                menuButtons[i].RenderText();
-            }
-            // continue or quit
+            statusText.RenderText();
+            menuButtons.RenderText();
         }
 
         /// <summary>
         /// Reset the Game State
         /// </summary>
-        public void ResetState() {
+        public void ResetState() { }
 
+        public void SetState(object extraState) {
+            Console.WriteLine(extraState);
+            try {
+                dynamic state = extraState;
+                score = state.Score;
+                won = state.Status;
+            } catch {
+                Console.WriteLine(extraState);
+            }
         }
 
         /// <summary>
         /// Update the Game State
         /// </summary>
         public void UpdateState() {
-
-            for (int i = 0; i < menuButtons.Length; i++) {
-                if (i == activeMenuButton) {
-                    menuButtons[i].SetColor(new Vec3I(255, 0, 0));
-                } else {
-                    menuButtons[i].SetColor(new Vec3I(255, 255, 255));
-                }
-
-                menuButtons[i].RenderText();
+            foreach (var behavior in behaviors) {
+                behavior();
             }
         }
 
@@ -102,66 +88,43 @@ namespace Breakout {
         public void HandleKeyEvent(KeyboardAction keyboardAction, KeyboardKey keyboardKey) {
             switch (keyboardAction) {
                 case KeyboardAction.KeyPress:
-                    KeyPress(keyboardKey);
+                    switch (keyboardKey) {
+                        case KeyboardKey.Escape: eventBus.RegisterEvent(GameEventType.WindowEvent, this, "CLOSE_WINDOW"); break;
+                        case KeyboardKey.Up: activeMenuButton = activeMenuButton.Prev(); break;
+                        case KeyboardKey.Down: activeMenuButton = activeMenuButton.Next(); break;
+                        case KeyboardKey.Enter:
+                            switch (activeMenuButton) {
+                                case GameOverButton.MainMenu:
+                                    eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SWITCH_STATE", "MainMenu");
+                                    break;
+                                case GameOverButton.Exit:
+                                    eventBus.RegisterEvent(GameEventType.WindowEvent, this, "CLOSE_WINDOW");
+                                    break;
+                            }
+                            break;
+                        default: break;
+                    }
                     break;
-                case KeyboardAction.KeyRelease:
-                    break;
-                default:
-                    break;
+                default: break;
             }
         }
+    }
 
-        /// <summary>
-        /// Key Press Handler
-        /// </summary>
-        public void KeyPress(KeyboardKey keyboardKey) {
-            switch (keyboardKey) {
-                case KeyboardKey.Escape:
-                    BreakoutBus.GetBus().RegisterEvent(new GameEvent {
-                        EventType = GameEventType.WindowEvent,
-                        From = this,
-                        Message = "CLOSE_WINDOW"
-                    });
-                    break;
+    enum GameOverButton {
+        MainMenu,
+        Exit
+    }
 
-                case KeyboardKey.Down:
-                    if (activeMenuButton < menuButtons.Length - 1) {
-                        activeMenuButton++;
-                    } else {
-                        activeMenuButton = 0;
-                    }
-                    UpdateState();
-                    break;
+    static class GameOverButtonExt {
+        public static GameOverButton Prev(this GameOverButton button) {
+            var index = (int)button;
+            return (GameOverButton)Math.Max(0, index - 1);
+        }
 
-                case KeyboardKey.Up:
-                    if (activeMenuButton > 0) {
-                        activeMenuButton--;
-                    } else {
-                        activeMenuButton = menuButtons.Length - 1;
-                    }
-                    UpdateState();
-                    break;
-
-                case KeyboardKey.Enter:
-                    if (activeMenuButton == 0) {
-                        BreakoutBus.GetBus().RegisterEvent(
-                            new GameEvent {
-                                EventType = GameEventType.GameStateEvent,
-                                From = this,
-                                Message = "MAIN_MENU",
-                            });
-                    } else if (activeMenuButton == 1) {
-                        BreakoutBus.GetBus().RegisterEvent(
-                            new GameEvent {
-                                EventType = GameEventType.WindowEvent,
-                                From = this,
-                                Message = "CLOSE_WINDOW",
-                            });
-                    }
-                    break;
-                default:
-                    break;
-            }
+        public static GameOverButton Next(this GameOverButton button) {
+            var all = typeof(GameOverButton).GetEnumValues();
+            var index = (int)button;
+            return (GameOverButton)Math.Min(all.Length - 1, index + 1);
         }
     }
 }

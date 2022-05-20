@@ -21,7 +21,8 @@ namespace Breakout.BreakoutStates {
         /// Adds a state and sets it to active if it is the first state to be added.
         /// </summary>
         public void AddState(IGameState gameState) {
-            string name = gameState.GetType().ToString();
+            string name = gameState.GetType().Name;
+            Console.WriteLine("Adding GameState " + name);
 
             if (ActiveState == null && states.Count == 0) {
                 ActiveState = gameState;
@@ -37,27 +38,17 @@ namespace Breakout.BreakoutStates {
             switch (gameEvent.EventType) {
                 case GameEventType.GameStateEvent:
                     switch (gameEvent.Message) {
-                        case "SWITCH_STATE":
-                            SwitchState(gameEvent.StringArg1);
-                            break;
-                        case "RESET_STATE":
-                            states[gameEvent.StringArg1]?.ResetState();
-                            break;
+                        case "SWITCH_STATE": SwitchState(gameEvent.StringArg1); break;
+                        case "RESET_STATE": states[gameEvent.StringArg1]?.ResetState(); break;
+                        case "SET_STATE": states[gameEvent.StringArg1]?.SetState(gameEvent.ObjectArg1); break;
                     }
                     break;
                 case GameEventType.InputEvent:
                     if (gameEvent.Message == "CLOSE_WINDOW") {
-                        eventBus.RegisterEvent(
-                            new GameEvent {
-                                EventType = GameEventType.GameStateEvent,
-                                From = this,
-                                Message = "CLOSE_WINDOW"
-                            }
-                        );
+                        eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "CLOSE_WINDOW");
                     }
                     break;
-                default:
-                    break;
+                default: break;
             }
         }
 

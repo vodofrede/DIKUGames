@@ -34,12 +34,30 @@ namespace Breakout {
             eventBus.Unsubscribe(eventType, gameEventProcessor);
         }
 
+        public void RegisterEvent(GameEvent gameEvent) {
+            eventBus.RegisterEvent(gameEvent);
+        }
+
+        public void RegisterEvent(GameEventType eventType, object from, string message, string stringArg1 = "", object? objectArg1 = null) {
+            RegisterEvent(new GameEvent {
+                EventType = eventType,
+                From = from,
+                Message = message,
+                StringArg1 = stringArg1,
+                ObjectArg1 = objectArg1,
+            });
+        }
+
         public void RegisterTimedEvent(GameEvent gameEvent, TimePeriod timePeriod) {
             eventBus.RegisterTimedEvent(gameEvent, timePeriod);
         }
 
-        public void RegisterEvent(GameEvent gameEvent) {
-            eventBus.RegisterEvent(gameEvent);
+        public void RegisterTimedEvent(object from, string message, long timeoutMilliseconds) {
+            RegisterTimedEvent(new GameEvent {
+                EventType = GameEventType.TimedEvent,
+                From = from,
+                Message = message,
+            }, TimePeriod.NewMilliseconds(timeoutMilliseconds));
         }
     }
 }

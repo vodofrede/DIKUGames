@@ -1,5 +1,5 @@
 using System;
-using Breakout.Block;
+using Breakout.Blocks;
 using DIKUArcade.Entities;
 using DIKUArcade.GUI;
 using DIKUArcade.Math;
@@ -9,14 +9,14 @@ namespace BreakoutTests;
 
 public class TestBlock {
 #pragma warning disable CS8618
-    StandardBlock block;
+    Block block;
 #pragma warning restore CS8618
 
     [SetUp]
     public void Setup() {
         Window.CreateOpenGLContext();
 
-        block = new StandardBlock(
+        block = new Block(
             new Vec2F(0.5f, 0.5f),
             "red-block.png"
         );
@@ -25,7 +25,7 @@ public class TestBlock {
     [Test]
     public void TestIsEntity() {
         // test satisfies R.1
-        Assert.True(typeof(StandardBlock).IsSubclassOf(typeof(Entity)));
+        Assert.True(typeof(Block).IsSubclassOf(typeof(Entity)));
     }
 
     [Test]
@@ -40,7 +40,7 @@ public class TestBlock {
     public void TestHealthDecrement() {
         // test satisfies R.5
         Assert.AreEqual(1, block.Hitpoints);
-        block.DecreaseHitpoints();
+        block.OnHit();
         Assert.AreEqual(0, block.Hitpoints);
     }
 
@@ -48,6 +48,6 @@ public class TestBlock {
     public void TestDestroyBlock() {
         // test satisfies R.6
         Assert.AreEqual(1, block.Hitpoints);
-        Assert.AreEqual("Destroy", block.DecreaseHitpoints());
+        Assert.AreEqual(BlockAction.Destroy, block.OnHit());
     }
 }

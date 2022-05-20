@@ -1,18 +1,9 @@
 using DIKUArcade.Math;
 
 namespace Breakout.Blocks {
-    public class Invincible : StandardBlock {
+    public class Invincible : Block {
         public Invincible(Vec2F pos, string imageName) : base(pos, imageName) {
-            Hitpoints = 1;
-            Value = 1;
-            Type = "Invincible";
-        }
-
-        /// <summary>
-        /// Decrease hitpoints and return an effect
-        /// </summary>
-        public override string DecreaseHitpoints() {
-            return "Invincible";
+            Effect = "Invincible";
         }
     }
 }

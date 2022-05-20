@@ -1,20 +1,18 @@
-using DIKUArcade.Entities;
-using DIKUArcade.Graphics;
 using DIKUArcade.Math;
 
 namespace Breakout.Blocks {
-    public class Unbreakable : StandardBlock {
-        public Unbreakable(Vec2F pos, string imageName) : base(pos, imageName) {
-            Hitpoints = 1;
-            Value = 1;
-            Type = "Unbreakable";
-        }
+    public class Unbreakable : Block {
+        public Unbreakable(Vec2F pos, string imageName) : base(pos, imageName) { }
 
         /// <summary>
         /// Decrease hitpoints and return an effect
         /// </summary>
-        public override string DecreaseHitpoints() {
-            return "None";
+        public override BlockAction OnHit() {
+            return BlockAction.None;
+        }
+
+        public override bool IsBreakable() {
+            return false;
         }
     }
 }

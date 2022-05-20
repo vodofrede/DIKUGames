@@ -1,9 +1,8 @@
-using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 using DIKUArcade.Math;
 
 namespace Breakout.Blocks {
-    public class Hardened : StandardBlock {
+    public class Hardened : Block {
         public Hardened(Vec2F pos, string imageName) : base(pos, imageName) {
             string altImageName = imageName.Insert(imageName.Length - 3, "-damaged");
             Console.WriteLine("alt Image Name: " + altImageName);
@@ -11,15 +10,15 @@ namespace Breakout.Blocks {
 
             Hitpoints = 2;
             Value = 2;
-            Type = "Hardened";
         }
 
         /// <summary>
         /// Decrease hitpoints and return an effect
         /// </summary>
-        public override string DecreaseHitpoints() {
+        public override BlockAction OnHit() {
+            SwapImage();
             Hitpoints = Math.Max(Hitpoints - 1, 0);
-            return NoMoreHitpoints() ? "Destroy" : "None";
+            return Hitpoints <= 0 ? BlockAction.Destroy : BlockAction.None;
         }
     }
 }

@@ -12,9 +12,13 @@ namespace Breakout {
 
         // constructors
         public LevelLoader(List<Level> levels) {
-            this.levels = levels;
+            foreach (var level in levels) {
+                Console.WriteLine("Loaded level: " + level.Name);
+            }
+            // this.levels = levels;
+            this.levels = new() { ParseFile(Path.Combine("Assets", "Levels", "level2.txt")) };
         }
-        public LevelLoader(List<string> levelPaths) : this(levelPaths.Select(levelPath => TryParseFile(levelPath)).ToList()) { }
+        public LevelLoader(List<string> levelPaths) : this(levelPaths.Select(levelPath => ParseFile(levelPath)).ToList()) { }
         public LevelLoader() : this(Directory.GetFiles(Path.Combine("Assets", "Levels")).ToList()) { }
 
         // methods
@@ -34,7 +38,7 @@ namespace Breakout {
             levelIndex = 0;
         }
 
-        private static string mapPattern = @"(Level:\n)((.*\n)*)(Level\/)";
+        private static string mapPattern = @"(Map:\n)((.*\n)*)(Map\/)";
         private static string metaPattern = @"(Meta:\n)((.*\n)*)(Meta\/)";
         private static string legendPattern = @"(Legend:\n)((.*\n)*)(Legend\/)";
 
@@ -56,14 +60,13 @@ namespace Breakout {
 
             // parse meta
             string name = "placeholder";
-            int timeLimit = 9999 * 1000;
+            int? timeLimit = null;
             var meta = new Dictionary<char, string>();
             foreach (string line in metaString.Split("\n")) {
                 if (line.StartsWith("Name")) {
                     name = line[6..];
                 } else if (line.StartsWith("Time")) {
-                    Console.WriteLine("Found time limit");
-                    timeLimit = int.Parse(line[6..]) * 1000;
+                    timeLimit = int.Parse(line[6..]);
                 } else if (line.StartsWith("Hardened")) {
                     meta[line[10]] = "Hardened";
                 } else if (line.StartsWith("PowerUp")) {
@@ -93,14 +96,14 @@ namespace Breakout {
                                     blocks.AddEntity(new Hardened(new Vec2F(x, y), legend[c]));
                                     break;
                                 case "PowerUp":
-                                    blocks.AddEntity(new SpeedPowerUp(new Vec2F(x, y), legend[c]));
+                                    blocks.AddEntity(new DoubleSize(new Vec2F(x, y), legend[c]));
                                     break;
                                 case "Unbreakable":
                                     blocks.AddEntity(new Unbreakable(new Vec2F(x, y), legend[c]));
                                     break;
                             }
                         } else {
-                            blocks.AddEntity(new StandardBlock(new Vec2F(x, y), legend[c]));
+                            blocks.AddEntity(new Block(new Vec2F(x, y), legend[c]));
                         }
                     }
                 }

@@ -1,21 +1,19 @@
-using DIKUArcade.Entities;
-using DIKUArcade.Graphics;
 using DIKUArcade.Math;
 
 namespace Breakout.Blocks {
-    public class Hungry : StandardBlock {
+    public class Hungry : Block {
         public Hungry(Vec2F pos, string imageName) : base(pos, imageName) {
             Hitpoints = 2;
             Value = 2;
-            Type = "Hungry";
+            Effect = "Hungry";
         }
 
         /// <summary>
         /// Decrease hitpoints and return an effect
         /// </summary>
-        public override string DecreaseHitpoints() {
+        public override BlockAction OnHit() {
             Hitpoints = Math.Max(Hitpoints - 1, 0);
-            return NoMoreHitpoints() ? "Destroy" : "Hungry";
+            return Hitpoints <= 0 ? BlockAction.Destroy : BlockAction.None;
         }
     }
 }

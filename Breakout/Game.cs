@@ -1,11 +1,8 @@
 using Breakout.BreakoutStates;
 using DIKUArcade;
-using DIKUArcade.Entities;
 using DIKUArcade.Events;
-using DIKUArcade.Graphics;
 using DIKUArcade.GUI;
 using DIKUArcade.Input;
-using DIKUArcade.Math;
 
 namespace Breakout {
     public class Game : DIKUGame, IGameEventProcessor {
@@ -53,7 +50,7 @@ namespace Breakout {
         }
 
         /// <summary>
-        /// Render the game using the current state
+        /// RenderText the game using the current state
         /// </summary>
         public override void Render() {
             window.Clear();
