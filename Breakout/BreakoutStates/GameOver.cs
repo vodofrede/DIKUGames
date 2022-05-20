@@ -32,7 +32,7 @@ namespace Breakout.BreakoutStates {
             statusText.AddTextField(headerText);
             TextField outcomeText = new TextField(() => "You " + (won ? "Won!" : "Lost!"), new Vec2F(0.18f, 0.4f), new Vec2F(0.8f, 0.4f));
             statusText.AddTextField(outcomeText);
-            statusText.AddTextField(new TextField(() => "Your score was: " + score, new Vec2F(0.2f, 0.3f), new Vec2F(0.3f, 0.4f)));
+            statusText.AddTextField(new TextField(() => "Your score was: " + score, new Vec2F(0.2f, 0.3f), new Vec2F(0.3f, 0.6f)));
 
             // menu buttons
             TextField mainMenuButton = new TextField(() => "Main Menu", new Vec2F(0.2f, 0.2f), new Vec2F(0.2f, 0.2f));
