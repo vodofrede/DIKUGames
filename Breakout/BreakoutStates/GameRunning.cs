@@ -9,13 +9,12 @@ using DIKUArcade.State;
 using DIKUArcade.Timers;
 
 namespace Breakout.BreakoutStates {
-    public class GameRunning : IGameState, IGameEventProcessor {
+    public class GameRunning : IGameStateExt, IGameEventProcessor {
         // constants
         private const int LIVES = 3;
         private const float SPEEDINCREASE = 0.003f;
         private const float MAXIMUM_ANGLE = 3 * MathF.PI / 12;
         private const float INITIAL_BALLSPEED = 0.01f;
-        private const int TIME_LIMIT = 300;
 
         // fields
         private EventBus eventBus;
@@ -85,6 +84,11 @@ namespace Breakout.BreakoutStates {
             lives = LIVES;
         }
 
+        /// <summary>
+        /// Ingest variables from other state
+        /// </summary>
+        public void SetState(object extraState) { }
+
         private int TimeLeft() {
             var elapsed = (int)Math.Floor(StaticTimer.GetElapsedSeconds()) - startTime;
             return (level?.TimeLimit - elapsed) ?? 300;
@@ -94,40 +98,6 @@ namespace Breakout.BreakoutStates {
         /// Update State
         /// </summary>
         public void UpdateState() {
-            // early returns
-            if (lives <= 0 || TimeLeft() <= 0) {
-                // game has been lost
-                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SET_STATE", "GameOver", new { Score = score, Status = "GAME_LOST" });
-                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SWITCH_STATE", "GameOver");
-            }
-            if (level == null) {
-                // game has been won
-                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SET_STATE", "GameOver", new { Score = score, Status = "GAME_WON" });
-                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SWITCH_STATE", "GameOver");
-            }
-            // load next map if no blocks are left
-            bool anyBlocksLeft = false;
-            level?.Blocks.Iterate(block => {
-                if (block.IsBreakable()) {
-                    anyBlocksLeft = true;
-                }
-            });
-            if (!anyBlocksLeft) {
-                // next level, we cant reset fully as we need to keep levelLoader state.
-                level = levelLoader.Next();
-
-                player = new Player(new Image(Path.Combine("Assets", "Images", "player.png")));
-                eventBus.Subscribe(GameEventType.PlayerEvent, player);
-
-                ball = new Ball(new Vec2F(0.5f, 0.15f));
-                ballSpeed = INITIAL_BALLSPEED;
-                speedIncrease = SPEEDINCREASE;
-
-                powerUps = new();
-
-                startTime = (int)Math.Floor(StaticTimer.GetElapsedSeconds());
-            }
-
             eventBus.ProcessEventsSequentially();
 
             // process powerups
@@ -251,6 +221,40 @@ namespace Breakout.BreakoutStates {
                     }
                 };
             });
+
+            // determine game state
+            if (lives <= 0 || TimeLeft() <= 0) {
+                // game has been lost
+                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SET_STATE", "GameOver", new { Score = score, Won = false });
+                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SWITCH_STATE", "GameOver");
+            }
+            if (level == null) {
+                // game has been won
+                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SET_STATE", "GameOver", new { Score = score, Won = true });
+                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SWITCH_STATE", "GameOver");
+            }
+            // load next map if no blocks are left
+            bool anyBlocksLeft = false;
+            level?.Blocks.Iterate(block => {
+                if (block.IsBreakable()) {
+                    anyBlocksLeft = true;
+                }
+            });
+            if (!anyBlocksLeft) {
+                // next level, we cant reset fully as we need to keep levelLoader state.
+                level = levelLoader.Next();
+
+                player = new Player(new Image(Path.Combine("Assets", "Images", "player.png")));
+                eventBus.Subscribe(GameEventType.PlayerEvent, player);
+
+                ball = new Ball(new Vec2F(0.5f, 0.15f));
+                ballSpeed = INITIAL_BALLSPEED;
+                speedIncrease = SPEEDINCREASE;
+
+                powerUps = new();
+
+                startTime = (int)Math.Floor(StaticTimer.GetElapsedSeconds());
+            }
         }
 
         /// <summary>

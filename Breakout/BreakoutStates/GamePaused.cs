@@ -6,7 +6,7 @@ using DIKUArcade.Math;
 using DIKUArcade.State;
 
 namespace Breakout.BreakoutStates {
-    public class GamePaused : IGameState {
+    public class GamePaused : IGameStateExt {
         private EventBus eventBus;
 
         private Entity backGroundImage = new(
@@ -54,6 +54,11 @@ namespace Breakout.BreakoutStates {
         /// Update the Game State
         /// </summary>
         public void UpdateState() { }
+
+        /// <summary>
+        /// Ingest variables from other state
+        /// </summary>
+        public void SetState(object extraState) { }
 
         /// <summary>
         /// Key Event Handler

@@ -6,7 +6,7 @@ using DIKUArcade.Math;
 using DIKUArcade.State;
 
 namespace Breakout.BreakoutStates {
-    public class MainMenu : IGameState {
+    public class MainMenu : IGameStateExt {
         private EventBus eventBus;
 
         // visuals
@@ -39,6 +39,9 @@ namespace Breakout.BreakoutStates {
             menuButtons.RenderText();
         }
 
+        /// <summary>
+        /// Update the State
+        /// </summary>
         public void UpdateState() { }
 
         /// <summary>
@@ -49,8 +52,9 @@ namespace Breakout.BreakoutStates {
         }
 
         /// <summary>
-        /// Update the State
+        /// Ingest variables from other state
         /// </summary>
+        public void SetState(object extraState) { }
 
         /// <summary>
         /// Handle Key Events

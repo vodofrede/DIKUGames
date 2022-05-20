@@ -6,11 +6,11 @@ using DIKUArcade.Math;
 using DIKUArcade.State;
 
 namespace Breakout.BreakoutStates {
-    public class GameOver : IGameState {
+    public class GameOver : IGameStateExt {
         private EventBus eventBus;
 
         // fields
-        private uint score = 0;
+        private int score = 0;
         private bool won = true;
 
         // visuals
@@ -32,7 +32,7 @@ namespace Breakout.BreakoutStates {
             var outcomeText = new TextField(() => "You " + (won ? "Won!" : "Lost!"), new Vec2F(0.18f, 0.4f), new Vec2F(0.8f, 0.4f));
             outcomeText.Behaviors.Add(() => _ = won ? outcomeText.SetColor(0, 255, 0) : outcomeText.SetColor(255, 165, 0));
             statusText.AddTextField(outcomeText);
-            statusText.AddTextField(new TextField(() => "Your score was: " + score, new Vec2F(0.2f, 0.3f), new Vec2F(0.3f, 0.6f)));
+            statusText.AddTextField(new TextField(() => "Score: " + score, new Vec2F(0.2f, 0.3f), new Vec2F(0.3f, 0.4f)));
 
             // menu buttons
             var mainMenuButton = new TextField(() => "Main Menu", new Vec2F(0.2f, 0.2f), new Vec2F(0.2f, 0.2f));
@@ -61,13 +61,9 @@ namespace Breakout.BreakoutStates {
 
         public void SetState(object extraState) {
             Console.WriteLine(extraState);
-            try {
-                dynamic state = extraState;
-                score = state.Score;
-                won = state.Status;
-            } catch {
-                Console.WriteLine(extraState);
-            }
+            dynamic state = extraState;
+            score = state.Score;
+            won = state.Won;
         }
 
         /// <summary>
