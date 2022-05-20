@@ -40,8 +40,7 @@ namespace Breakout.BreakoutStates {
                     switch (gameEvent.Message) {
                         case "SWITCH_STATE": SwitchState(gameEvent.StringArg1); break;
                         case "RESET_STATE": states[gameEvent.StringArg1]?.ResetState(); break;
-                        case "SET_STATE":
-                            states[gameEvent.StringArg1]?.SetState(gameEvent.ObjectArg1); break;
+                        case "SET_STATE": states[gameEvent.StringArg1]?.SetState(gameEvent.ObjectArg1); break;
                     }
                     break;
                 case GameEventType.InputEvent:

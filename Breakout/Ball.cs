@@ -6,7 +6,7 @@ namespace Breakout {
     public class Ball : Entity {
         // associated constants
         private const float DIAMETER = 0.05f;
-        private const float SPEED = 0.1f;
+        private const float SPEED = 0.01f;
         private const string IMAGE = "ball.png";
 
         // properties

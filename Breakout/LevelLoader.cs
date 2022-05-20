@@ -15,8 +15,8 @@ namespace Breakout {
             foreach (var level in levels) {
                 Console.WriteLine("Loaded level: " + level.Name);
             }
-            // this.levels = levels;
-            this.levels = new() { ParseFile(Path.Combine("Assets", "Levels", "level2.txt")) };
+            this.levels = levels;
+            // this.levels = new() { ParseFile(Path.Combine("Assets", "Levels", "level2.txt")) };
         }
         public LevelLoader(List<string> levelPaths) : this(levelPaths.Select(levelPath => ParseFile(levelPath)).ToList()) { }
         public LevelLoader() : this(Directory.GetFiles(Path.Combine("Assets", "Levels")).ToList()) { }
