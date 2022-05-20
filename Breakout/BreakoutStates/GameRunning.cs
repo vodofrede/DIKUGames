@@ -202,25 +202,25 @@ namespace Breakout.BreakoutStates {
                                 case "WidePowerUp":
                                     powerUps.AddEntity(new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "WidePowerUp.png")), () => {
                                         player.Shape.ScaleXFromCenter(player.Shape.Extent.X < 0.4f ? 2f : 1f);
-                                        eventBus.RegisterTimedEvent(this, "WIDE_STOP", 5000);
+                                        eventBus.AddOrResetTimedEvent(this, "WIDE_STOP", 5000);
                                     }));
                                     break;
                                 case "DoubleSize":
                                     powerUps.AddEntity(new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "BigPowerUp.png")), () => {
                                         ball.Shape.ScaleFromCenter(ball.Shape.Extent.X < 0.15f ? 1.5f : 1f);
-                                        eventBus.RegisterTimedEvent(this, "DOUBLE_SIZE_STOP", 5000);
+                                        eventBus.AddOrResetTimedEvent(this, "DOUBLE_SIZE_STOP", 5000);
                                     })); ;
                                     break;
                                 case "Invincible":
                                     powerUps.AddEntity(new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "InfinitePowerUp.png")), () => {
                                         invincible = true;
-                                        eventBus.RegisterTimedEvent(this, "INVINCIBLE_STOP", 20000);
+                                        eventBus.AddOrResetTimedEvent(this, "INVINCIBLE_STOP", 20000);
                                     }));
                                     break;
                                 case "SpeedPowerUp":
                                     powerUps.AddEntity(new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "DoubleSpeedPowerUp.png")), () => {
                                         player.MovementSpeed = player.MovementSpeed < 0.08 ? Player.MOVEMENT_SPEED * 1.5f : player.MovementSpeed;
-                                        eventBus.RegisterTimedEvent(this, "SPEED_STOP", 5000);
+                                        eventBus.AddOrResetTimedEvent(this, "SPEED_STOP", 5000);
                                     }));
                                     break;
                                 default: throw new NotImplementedException();
@@ -313,7 +313,7 @@ namespace Breakout.BreakoutStates {
                     player.MovementSpeed = Player.MOVEMENT_SPEED;
                     break;
                 case "DOUBLE_SIZE_STOP":
-                    ball.Shape.Extent = new Vec2F(0.1f, 0.1f);
+                    ball.Shape.Extent = new Vec2F(0.05f, 0.05f);
                     break;
             }
         }
