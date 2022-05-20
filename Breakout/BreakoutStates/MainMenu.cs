@@ -25,9 +25,9 @@ namespace Breakout.BreakoutStates {
             playButton.Behaviors.Add(() => { if (activeMenuButton == MainMenuButton.Play) { playButton.SetColor(255, 0, 0); } else { playButton.SetColor(255, 255, 255); } });
             menuButtons.AddTextField(playButton);
 
-            var quitButton = new TextField(() => "Exit", new Vec2F(0.2f, 0.4f), new Vec2F(0.2f, 0.2f));
-            playButton.Behaviors.Add(() => { if (activeMenuButton == MainMenuButton.Exit) { playButton.SetColor(255, 0, 0); } else { playButton.SetColor(255, 255, 255); } });
-            menuButtons.AddTextField(quitButton);
+            var exitButton = new TextField(() => "Exit", new Vec2F(0.2f, 0.4f), new Vec2F(0.2f, 0.2f));
+            playButton.Behaviors.Add(() => { if (activeMenuButton == MainMenuButton.Exit) { exitButton.SetColor(255, 0, 0); } else { exitButton.SetColor(255, 255, 255); } });
+            menuButtons.AddTextField(exitButton);
         }
 
         /// <summary>

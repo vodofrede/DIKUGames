@@ -16,10 +16,10 @@ namespace Breakout {
         }
 
         public void Render() {
-            text.SetText(displayed());
             foreach (var b in Behaviors) {
                 b();
             }
+            text.SetText(displayed());
             text.RenderText();
         }
 
