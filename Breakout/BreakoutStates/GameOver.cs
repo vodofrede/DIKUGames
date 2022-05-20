@@ -22,29 +22,27 @@ namespace Breakout.BreakoutStates {
         private TextDisplay statusText = new();
         private TextDisplay menuButtons = new();
         private GameOverButton activeMenuButton = GameOverButton.MainMenu;
-        private List<Action> behaviors = new();
 
         public GameOver(EventBus eventBus) {
             this.eventBus = eventBus;
 
             // status text
-            TextField headerText = new TextField(() => "Game Over!", new Vec2F(0.17f, 0.5f), new Vec2F(0.8f, 0.4f));
-            statusText.AddTextField(headerText);
-            TextField outcomeText = new TextField(() => "You " + (won ? "Won!" : "Lost!"), new Vec2F(0.18f, 0.4f), new Vec2F(0.8f, 0.4f));
+            statusText.AddTextField(new TextField(() => "Game Over!", new Vec2F(0.17f, 0.5f), new Vec2F(0.8f, 0.4f)));
+
+            var outcomeText = new TextField(() => "You " + (won ? "Won!" : "Lost!"), new Vec2F(0.18f, 0.4f), new Vec2F(0.8f, 0.4f));
+            outcomeText.Behaviors.Add(() => _ = won ? outcomeText.SetColor(0, 255, 0) : outcomeText.SetColor(255, 165, 0));
             statusText.AddTextField(outcomeText);
+
             statusText.AddTextField(new TextField(() => "Your score was: " + score, new Vec2F(0.2f, 0.3f), new Vec2F(0.3f, 0.4f)));
 
             // menu buttons
-            TextField mainMenuButton = new TextField(() => "Main Menu", new Vec2F(0.2f, 0.2f), new Vec2F(0.2f, 0.2f));
+            var mainMenuButton = new TextField(() => "Main Menu", new Vec2F(0.2f, 0.2f), new Vec2F(0.2f, 0.2f));
+            mainMenuButton.Behaviors.Add(() => _ = activeMenuButton == GameOverButton.MainMenu ? mainMenuButton.SetColor(255, 0, 0) : mainMenuButton.SetColor(255, 255, 255));
             menuButtons.AddTextField(mainMenuButton);
-            TextField exitButton = new TextField(() => "Exit", new Vec2F(0.2f, 0.1f), new Vec2F(0.2f, 0.2f));
+
+            var exitButton = new TextField(() => "Exit", new Vec2F(0.2f, 0.1f), new Vec2F(0.2f, 0.2f));
+            exitButton.Behaviors.Add(() => _ = activeMenuButton == GameOverButton.Exit ? exitButton.SetColor(255, 0, 0) : exitButton.SetColor(255, 255, 255));
             menuButtons.AddTextField(exitButton);
-
-            // behaviors
-            behaviors.Add(() => _ = won ? outcomeText.SetColor(0, 255, 0) : outcomeText.SetColor(255, 165, 0));
-            behaviors.Add(() => _ = activeMenuButton == GameOverButton.MainMenu ? mainMenuButton.SetColor(255, 0, 0) : mainMenuButton.SetColor(255, 255, 255));
-            behaviors.Add(() => _ = activeMenuButton == GameOverButton.Exit ? exitButton.SetColor(255, 0, 0) : exitButton.SetColor(255, 255, 255));
-
         }
 
         /// <summary>
@@ -77,9 +75,7 @@ namespace Breakout.BreakoutStates {
         /// Update the Game State
         /// </summary>
         public void UpdateState() {
-            foreach (var behavior in behaviors) {
-                behavior();
-            }
+
         }
 
         /// <summary>

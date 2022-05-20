@@ -16,20 +16,18 @@ namespace Breakout.BreakoutStates {
         );
         private TextDisplay menuButtons = new();
         private MainMenuButton activeMenuButton = MainMenuButton.Play;
-        private List<Action> behaviors = new();
 
         public MainMenu(EventBus eventBus) {
             this.eventBus = eventBus;
 
             // text on-screen
-            TextField playButton = new TextField(() => "New Game", new Vec2F(0.2f, 0.5f), new Vec2F(0.2f, 0.2f));
+            var playButton = new TextField(() => "New Game", new Vec2F(0.2f, 0.5f), new Vec2F(0.2f, 0.2f));
+            playButton.Behaviors.Add(() => { if (activeMenuButton == MainMenuButton.Play) { playButton.SetColor(255, 0, 0); } else { playButton.SetColor(255, 255, 255); } });
             menuButtons.AddTextField(playButton);
-            TextField quitButton = new TextField(() => "Exit", new Vec2F(0.2f, 0.4f), new Vec2F(0.2f, 0.2f));
-            menuButtons.AddTextField(quitButton);
 
-            // behaviors (text callbacks)
-            behaviors.Add(() => _ = activeMenuButton == MainMenuButton.Play ? playButton.SetColor(255, 0, 0) : playButton.SetColor(255, 255, 255));
-            behaviors.Add(() => _ = activeMenuButton == MainMenuButton.Exit ? quitButton.SetColor(255, 0, 0) : quitButton.SetColor(255, 255, 255));
+            var quitButton = new TextField(() => "Exit", new Vec2F(0.2f, 0.4f), new Vec2F(0.2f, 0.2f));
+            playButton.Behaviors.Add(() => { if (activeMenuButton == MainMenuButton.Exit) { playButton.SetColor(255, 0, 0); } else { playButton.SetColor(255, 255, 255); } });
+            menuButtons.AddTextField(quitButton);
         }
 
         /// <summary>
@@ -41,11 +39,7 @@ namespace Breakout.BreakoutStates {
             menuButtons.RenderText();
         }
 
-        public void UpdateState() {
-            foreach (var behavior in behaviors) {
-                behavior();
-            }
-        }
+        public void UpdateState() { }
 
         /// <summary>
         /// Reset the State
