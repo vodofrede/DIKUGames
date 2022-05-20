@@ -13,7 +13,7 @@ namespace Breakout.BreakoutStates {
         // constants
         private const int LIVES = 3;
         private const float SPEEDINCREASE = 0.003f;
-        private const float MAXIMUM_ANGLE = 5 * MathF.PI / 12;
+        private const float MAXIMUM_ANGLE = 3 * MathF.PI / 12;
         private const float INITIAL_BALLSPEED = 0.01f;
         private const int TIME_LIMIT = 300;
 
@@ -207,7 +207,7 @@ namespace Breakout.BreakoutStates {
                                     break;
                                 case "DoubleSize":
                                     powerUps.AddEntity(new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "BigPowerUp.png")), () => {
-                                        ball.Shape.ScaleFromCenter(ball.Shape.Extent.X < 0.41f ? 2f : 1f);
+                                        ball.Shape.ScaleFromCenter(ball.Shape.Extent.X < 0.15f ? 1.5f : 1f);
                                         eventBus.RegisterTimedEvent(this, "DOUBLE_SIZE_STOP", 5000);
                                     })); ;
                                     break;

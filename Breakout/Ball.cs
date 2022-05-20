@@ -35,11 +35,11 @@ namespace Breakout {
         public bool Move() {
             // bounce off the walls if position will be out of bounds
             float newX = Shape.Position.X + Velocity.X;
-            if (!(0.0f <= newX - Radius && newX < 1.0f - Radius)) {
+            if (!(0.0f <= newX - Radius && newX + Shape.Extent.X < 1.0f - Radius)) {
                 Velocity.X = -Velocity.X;
             }
             float newY = Shape.Position.Y + Velocity.Y;
-            if (!(newY < 1.0f - Radius)) {
+            if (!(newY + Shape.Extent.X < 1.0f - Radius)) {
                 Velocity.Y = -Velocity.Y;
             }
 
