@@ -3,7 +3,7 @@
 namespace Breakout {
     public class Program {
         private static void Main() {
-            WindowArgs windowArgs = new WindowArgs { Title = "Breakout v0.1" };
+            WindowArgs windowArgs = new WindowArgs { Title = "Breakout v999.0" };
             Game game = new(windowArgs);
             game.Run();
         }

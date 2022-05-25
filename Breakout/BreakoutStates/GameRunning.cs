@@ -9,13 +9,12 @@ using DIKUArcade.State;
 using DIKUArcade.Timers;
 
 namespace Breakout.BreakoutStates {
-    public class GameRunning : IGameState, IGameEventProcessor {
+    public class GameRunning : IGameStateExt, IGameEventProcessor {
         // constants
         private const int LIVES = 3;
         private const float SPEEDINCREASE = 0.003f;
         private const float MAXIMUM_ANGLE = 3 * MathF.PI / 12;
         private const float INITIAL_BALLSPEED = 0.01f;
-        private const int TIME_LIMIT = 300;
 
         // fields
         private EventBus eventBus;
@@ -85,6 +84,11 @@ namespace Breakout.BreakoutStates {
             lives = LIVES;
         }
 
+        /// <summary>
+        /// Ingest variables from other state
+        /// </summary>
+        public void SetState(object extraState) { }
+
         private int TimeLeft() {
             var elapsed = (int)Math.Floor(StaticTimer.GetElapsedSeconds()) - startTime;
             return (level?.TimeLimit - elapsed) ?? 300;
@@ -94,40 +98,6 @@ namespace Breakout.BreakoutStates {
         /// Update State
         /// </summary>
         public void UpdateState() {
-            // early returns
-            if (lives <= 0 || TimeLeft() <= 0) {
-                // game has been lost
-                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SET_STATE", "GameOver", new { Score = score, Status = "GAME_LOST" });
-                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SWITCH_STATE", "GameOver");
-            }
-            if (level == null) {
-                // game has been won
-                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SET_STATE", "GameOver", new { Score = score, Status = "GAME_WON" });
-                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SWITCH_STATE", "GameOver");
-            }
-            // load next map if no blocks are left
-            bool anyBlocksLeft = false;
-            level?.Blocks.Iterate(block => {
-                if (block.IsBreakable()) {
-                    anyBlocksLeft = true;
-                }
-            });
-            if (!anyBlocksLeft) {
-                // next level, we cant reset fully as we need to keep levelLoader state.
-                level = levelLoader.Next();
-
-                player = new Player(new Image(Path.Combine("Assets", "Images", "player.png")));
-                eventBus.Subscribe(GameEventType.PlayerEvent, player);
-
-                ball = new Ball(new Vec2F(0.5f, 0.15f));
-                ballSpeed = INITIAL_BALLSPEED;
-                speedIncrease = SPEEDINCREASE;
-
-                powerUps = new();
-
-                startTime = (int)Math.Floor(StaticTimer.GetElapsedSeconds());
-            }
-
             eventBus.ProcessEventsSequentially();
 
             // process powerups
@@ -202,25 +172,25 @@ namespace Breakout.BreakoutStates {
                                 case "WidePowerUp":
                                     powerUps.AddEntity(new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "WidePowerUp.png")), () => {
                                         player.Shape.ScaleXFromCenter(player.Shape.Extent.X < 0.4f ? 2f : 1f);
-                                        eventBus.RegisterTimedEvent(this, "WIDE_STOP", 5000);
+                                        eventBus.AddOrResetTimedEvent(this, "WIDE_STOP", 5000);
                                     }));
                                     break;
                                 case "DoubleSize":
                                     powerUps.AddEntity(new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "BigPowerUp.png")), () => {
                                         ball.Shape.ScaleFromCenter(ball.Shape.Extent.X < 0.15f ? 1.5f : 1f);
-                                        eventBus.RegisterTimedEvent(this, "DOUBLE_SIZE_STOP", 5000);
+                                        eventBus.AddOrResetTimedEvent(this, "DOUBLE_SIZE_STOP", 5000);
                                     })); ;
                                     break;
                                 case "Invincible":
                                     powerUps.AddEntity(new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "InfinitePowerUp.png")), () => {
                                         invincible = true;
-                                        eventBus.RegisterTimedEvent(this, "INVINCIBLE_STOP", 20000);
+                                        eventBus.AddOrResetTimedEvent(this, "INVINCIBLE_STOP", 20000);
                                     }));
                                     break;
                                 case "SpeedPowerUp":
                                     powerUps.AddEntity(new PowerUp(blockPosition, new Image(Path.Combine("Assets", "Images", "DoubleSpeedPowerUp.png")), () => {
                                         player.MovementSpeed = player.MovementSpeed < 0.08 ? Player.MOVEMENT_SPEED * 1.5f : player.MovementSpeed;
-                                        eventBus.RegisterTimedEvent(this, "SPEED_STOP", 5000);
+                                        eventBus.AddOrResetTimedEvent(this, "SPEED_STOP", 5000);
                                     }));
                                     break;
                                 default: throw new NotImplementedException();
@@ -251,6 +221,40 @@ namespace Breakout.BreakoutStates {
                     }
                 };
             });
+
+            // determine game state
+            if (lives <= 0 || TimeLeft() <= 0) {
+                // game has been lost
+                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SET_STATE", "GameOver", new { Score = score, Won = false });
+                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SWITCH_STATE", "GameOver");
+            }
+            if (level == null) {
+                // game has been won
+                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SET_STATE", "GameOver", new { Score = score, Won = true });
+                eventBus.RegisterEvent(GameEventType.GameStateEvent, this, "SWITCH_STATE", "GameOver");
+            }
+            // load next map if no blocks are left
+            bool anyBlocksLeft = false;
+            level?.Blocks.Iterate(block => {
+                if (block.IsBreakable()) {
+                    anyBlocksLeft = true;
+                }
+            });
+            if (!anyBlocksLeft) {
+                // next level, we cant reset fully as we need to keep levelLoader state.
+                level = levelLoader.Next();
+
+                player = new Player(new Image(Path.Combine("Assets", "Images", "player.png")));
+                eventBus.Subscribe(GameEventType.PlayerEvent, player);
+
+                ball = new Ball(new Vec2F(0.5f, 0.15f));
+                ballSpeed = INITIAL_BALLSPEED;
+                speedIncrease = SPEEDINCREASE;
+
+                powerUps = new();
+
+                startTime = (int)Math.Floor(StaticTimer.GetElapsedSeconds());
+            }
         }
 
         /// <summary>
@@ -313,7 +317,7 @@ namespace Breakout.BreakoutStates {
                     player.MovementSpeed = Player.MOVEMENT_SPEED;
                     break;
                 case "DOUBLE_SIZE_STOP":
-                    ball.Shape.Extent = new Vec2F(0.1f, 0.1f);
+                    ball.Shape.Extent = new Vec2F(0.05f, 0.05f);
                     break;
             }
         }

@@ -6,7 +6,7 @@ using DIKUArcade.Math;
 using DIKUArcade.State;
 
 namespace Breakout.BreakoutStates {
-    public class GamePaused : IGameState {
+    public class GamePaused : IGameStateExt {
         private EventBus eventBus;
 
         private Entity backGroundImage = new(
@@ -16,23 +16,22 @@ namespace Breakout.BreakoutStates {
 
         private TextDisplay menuButtons = new();
         private GamePausedButton activeMenuButton = GamePausedButton.Continue;
-        private List<Action> behaviors = new();
 
         public GamePaused(EventBus eventBus) {
             this.eventBus = eventBus;
 
             // buttons
             var continueButton = new TextField(() => "Continue", new Vec2F(0.2f, 0.6f), new Vec2F(0.2f, 0.2f));
+            continueButton.Behaviors.Add(() => _ = activeMenuButton == GamePausedButton.Continue ? continueButton.SetColor(255, 0, 0) : continueButton.SetColor(255, 255, 255));
             menuButtons.AddTextField(continueButton);
-            var mainMenuButton = new TextField(() => "Main Menu", new Vec2F(0.2f, 0.5f), new Vec2F(0.2f, 0.2f));
-            menuButtons.AddTextField(mainMenuButton);
-            var exitButton = new TextField(() => "Exit", new Vec2F(0.2f, 0.4f), new Vec2F(0.2f, 0.2f));
-            menuButtons.AddTextField(exitButton);
 
-            // behaviors
-            behaviors.Add(() => _ = activeMenuButton == GamePausedButton.Continue ? continueButton.SetColor(255, 0, 0) : continueButton.SetColor(255, 255, 255));
-            behaviors.Add(() => _ = activeMenuButton == GamePausedButton.MainMenu ? mainMenuButton.SetColor(255, 0, 0) : mainMenuButton.SetColor(255, 255, 255));
-            behaviors.Add(() => _ = activeMenuButton == GamePausedButton.Exit ? exitButton.SetColor(255, 0, 0) : exitButton.SetColor(255, 255, 255));
+            var mainMenuButton = new TextField(() => "Main Menu", new Vec2F(0.2f, 0.5f), new Vec2F(0.2f, 0.2f));
+            mainMenuButton.Behaviors.Add(() => _ = activeMenuButton == GamePausedButton.MainMenu ? mainMenuButton.SetColor(255, 0, 0) : mainMenuButton.SetColor(255, 255, 255));
+            menuButtons.AddTextField(mainMenuButton);
+
+            var exitButton = new TextField(() => "Exit", new Vec2F(0.2f, 0.4f), new Vec2F(0.2f, 0.2f));
+            exitButton.Behaviors.Add(() => _ = activeMenuButton == GamePausedButton.Exit ? exitButton.SetColor(255, 0, 0) : exitButton.SetColor(255, 255, 255));
+            menuButtons.AddTextField(exitButton);
         }
 
         /// <summary>
@@ -54,11 +53,12 @@ namespace Breakout.BreakoutStates {
         /// <summary>
         /// Update the Game State
         /// </summary>
-        public void UpdateState() {
-            foreach (var behavior in behaviors) {
-                behavior();
-            }
-        }
+        public void UpdateState() { }
+
+        /// <summary>
+        /// Ingest variables from other state
+        /// </summary>
+        public void SetState(object extraState) { }
 
         /// <summary>
         /// Key Event Handler

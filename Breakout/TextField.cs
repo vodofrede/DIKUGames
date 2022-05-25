@@ -6,6 +6,7 @@ namespace Breakout {
     public class TextField {
         protected Text text;
         protected Func<string> displayed;
+        public List<Action> Behaviors { get; protected set; } = new();
 
         public TextField(Func<string> displayed, Vec2F pos, Vec2F extent) {
             text = new Text(displayed(), pos, extent);
@@ -15,6 +16,9 @@ namespace Breakout {
         }
 
         public void Render() {
+            foreach (var b in Behaviors) {
+                b();
+            }
             text.SetText(displayed());
             text.RenderText();
         }

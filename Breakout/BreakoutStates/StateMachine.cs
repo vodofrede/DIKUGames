@@ -5,7 +5,7 @@ namespace Breakout.BreakoutStates {
 
     public class StateMachine : IGameEventProcessor {
         protected EventBus eventBus;
-        protected Dictionary<string, IGameState> states;
+        protected Dictionary<string, IGameStateExt> states;
         public IGameState? ActiveState { get; private set; }
 
         public StateMachine(EventBus eventBus) {
@@ -20,7 +20,7 @@ namespace Breakout.BreakoutStates {
         /// <summary>
         /// Adds a state and sets it to active if it is the first state to be added.
         /// </summary>
-        public void AddState(IGameState gameState) {
+        public void AddState(IGameStateExt gameState) {
             string name = gameState.GetType().Name;
             Console.WriteLine("Adding GameState " + name);
 

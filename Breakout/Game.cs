@@ -11,8 +11,9 @@ namespace Breakout {
 
         public Game(WindowArgs windowArgs) : base(windowArgs) {
             eventBus = new EventBus();
-            stateMachine = new StateMachine(eventBus);
 
+            // state machine initialization
+            stateMachine = new StateMachine(eventBus);
             stateMachine.AddState(new MainMenu(eventBus));
             stateMachine.AddState(new GameRunning(eventBus));
             stateMachine.AddState(new GamePaused(eventBus));

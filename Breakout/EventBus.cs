@@ -59,5 +59,17 @@ namespace Breakout {
                 Message = message,
             }, TimePeriod.NewMilliseconds(timeoutMilliseconds));
         }
+
+        public void AddOrResetTimedEvent(GameEvent gameEvent, TimePeriod timePeriod) {
+            eventBus.AddOrResetTimedEvent(gameEvent, timePeriod);
+        }
+
+        public void AddOrResetTimedEvent(object from, string message, long timeoutMilliseconds) {
+            AddOrResetTimedEvent(new GameEvent {
+                EventType = GameEventType.TimedEvent,
+                From = from,
+                Message = message,
+            }, TimePeriod.NewMilliseconds(timeoutMilliseconds));
+        }
     }
 }
