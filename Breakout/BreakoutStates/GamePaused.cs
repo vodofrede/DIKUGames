@@ -11,7 +11,7 @@ namespace Breakout.BreakoutStates {
 
         private Entity backGroundImage = new(
             new DynamicShape(new Vec2F(-1.0f, -1.0f), new Vec2F(2.0f, 2.0f)),
-            new Image(Path.Combine("Assets", "Images", "SpaceBackground.png"))
+            new Image(Path.Combine("Assets", "Images", "BreakoutTitleScreen.png"))
         );
 
         private TextDisplay menuButtons = new();

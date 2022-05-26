@@ -8,9 +8,19 @@
 // using DIKUArcade.Events;
 // using NUnit.Framework;
 // using Breakout.BreakoutStates;
+// using DIKUArcade.State;
 
 // namespace GameTests {
 //     public class TestGame {
+//         #pragma warning disable CS8618
+//         Player player;
+//         Ball ball;
+//         Level level;
+//         LevelLoader levelLoader;
+//         StateMachine stateMachine;
+//         // Player player;
+//         #pragma warning restore CS8618
+
 //         [SetUp]
 //         public void Setup() {
 //             Window.CreateOpenGLContext();
@@ -22,21 +32,22 @@
 //             stateMachine.SwitchState("GameRunning");
 
 //             // player setup
-//             Player player = new Player(new Image(Path.Combine("Assets", "Images", "player.png")));
+//             player = new Player(new Image(Path.Combine("Assets", "Images", "player.png")));
 //             eventBus.Subscribe(GameEventType.PlayerEvent, player);
-//             eventBus.Subscribe(GameEventType.TimedEvent, this);
+//             // eventBus.Subscribe(GameEventType.TimedEvent, this);
 
 //             // other entities
-//             Ball ball = new Ball(new Vec2F(0.5f, 0.15f));
-//             LevelLoader levelLoader = new LevelLoader();
-//             Level level = levelLoader.Next();
+//             ball = new Ball(new Vec2F(0.5f, 0.15f));
+//             levelLoader = new LevelLoader();
+//             level = levelLoader.Next();
 //         }
 
 
 //         [Test]
-//         public void TestStartsAtCenter() {
+//         public void TestPlayerLivesNeverNegative() {
 //             // test satisfies R.1
-//             Assert.True(0.4f < player.Shape.Position.X && player.Shape.Position.X < 0.6f);
+//             GameRunning gameRunning = (GameRunning)stateMachine.ActiveState;
+//             Assert.GreaterOrEqual(gameRunning.lives, 0); 
 //         }
 //     }
 // }
