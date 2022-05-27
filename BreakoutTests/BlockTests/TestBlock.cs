@@ -59,7 +59,8 @@ public class TestBlock {
         // test satisfies R.2
         Console.WriteLine(block.Hitpoints);
         Console.WriteLine(block.Value);
-        Assert.Pass();
+        Assert.IsNotNull(block.Hitpoints);
+        Assert.IsNotNull(block.Value);
     }
 
     [Test]
@@ -76,6 +77,9 @@ public class TestBlock {
         Assert.AreEqual(1, block.Hitpoints);
         Assert.AreEqual(BlockAction.Destroy, block.OnHit());
     }
+
+    // The following section does not currently work. We have kept it to assist potential future development.
+    // For now these tests have been performed visually in the game.
 
     // [Test]
     // public void TestDoubleSize() {
