@@ -1,108 +1,124 @@
 using System;
 using System.IO;
-using Breakout.Blocks;
 using Breakout;
+using Breakout.Blocks;
 using DIKUArcade.Entities;
+using DIKUArcade.Graphics;
 using DIKUArcade.GUI;
 using DIKUArcade.Math;
 using NUnit.Framework;
-using DIKUArcade.Graphics;
 
 namespace BreakoutTests;
 
 public class TestBlock {
-#pragma warning disable CS8618
-    Block block;
-    DoubleSize doubleSize;
-    ExtraLife extraLife;
-    SpeedPowerUp speedPowerUp;
-    Player player;
-#pragma warning restore CS8618
+    Block? block;
 
     [SetUp]
     public void Setup() {
         Window.CreateOpenGLContext();
-
-        player = new Player(
-            new Image(Path.Combine("Assets", "Images", "player.png"))
-        );
-
-        block = new Block(
-            new Vec2F(0.5f, 0.5f),
-            "red-block.png"
-        );
-
-        doubleSize = new DoubleSize(
-            new Vec2F(0.5f, 0.5f),
-            "red-block.png"
-        );
-
-        extraLife = new ExtraLife(
-            new Vec2F(0.5f, 0.5f),
-            "red-block.png"
-        );
-
-        speedPowerUp = new SpeedPowerUp(
-            new Vec2F(0.5f, 0.5f),
-            "red-block.png"
-        );
     }
 
-    [Test]
-    public void TestIsEntity() {
-        // test satisfies R.1
+    public static void MandatoryBlockRequirements(Block block) {
         Assert.True(typeof(Block).IsSubclassOf(typeof(Entity)));
-    }
-
-    [Test]
-    public void TestHasValueAndHealth() {
-        // test satisfies R.2
-        Console.WriteLine(block.Hitpoints);
-        Console.WriteLine(block.Value);
         Assert.IsNotNull(block.Hitpoints);
         Assert.IsNotNull(block.Value);
     }
 
-    [Test]
-    public void TestHealthDecrement() {
-        // test satisfies R.5
-        Assert.AreEqual(1, block.Hitpoints);
+    public static void HealthCanDecrement(Block block) {
+        var hitpoints = block.Hitpoints;
         block.OnHit();
-        Assert.AreEqual(0, block.Hitpoints);
+        Assert.True(block.Hitpoints == 0 || block.Hitpoints == hitpoints - 1);
     }
 
     [Test]
-    public void TestDestroyBlock() {
-        // test satisfies R.6
-        Assert.AreEqual(1, block.Hitpoints);
-        Assert.AreEqual(BlockAction.Destroy, block.OnHit());
+    public void TestNormalBlock() {
+        block = new Block(new Vec2F(0.0f, 0.0f), "blue-block.png");
+
+        Assert.AreEqual(block.OnHit(), BlockAction.Destroy);
+        Assert.AreEqual(block.Effect, "None");
+        MandatoryBlockRequirements(block);
+        HealthCanDecrement(block);
     }
 
-    // The following section does not currently work. We have kept it to assist potential future development.
-    // For now these tests have been performed visually in the game.
+    [Test]
+    public void TestDoubleSize() {
+        block = new DoubleSize(new Vec2F(0.0f, 0.0f), "blue-block.png");
 
-    // [Test]
-    // public void TestDoubleSize() {
-    //     Vec2F originalSize = player.Shape.Extent;
-    //     doubleSize.OnHit();
-    //     Vec2F updatedSize = player.Shape.Extent;
-    //     Assert.AreEqual(originalSize, updatedSize);
-    // }
+        Assert.AreEqual(block.OnHit(), BlockAction.Destroy);
+        Assert.AreEqual(block.Effect, "DoubleSize");
+        MandatoryBlockRequirements(block);
+        HealthCanDecrement(block);
+    }
 
-    // [Test]
-    // public void TestExtraLife() {
-    //     // float originaLife = player.MovementSpeed;
-    //     extraLife.DeleteEntity();
-    //     // float updatedLife = player.MovementSpeed;
-    
-    //     Assert.AreEqual(1, extraLife.Hitpoints);
-    // }
+    [Test]
+    public void TestExtraLife() {
+        block = new ExtraLife(new Vec2F(0.0f, 0.0f), "blue-block.png");
 
-    // [Test]
-    // public void TestSpeedPowerUp() {
-    //     float originalSpeed = player.MovementSpeed;
-    //     speedPowerUp.OnHit();
-    //     float updatedSpeed = player.MovementSpeed;
-    //     Assert.AreEqual(originalSpeed, updatedSpeed);
-    // }
+        Assert.AreEqual(block.OnHit(), BlockAction.Destroy);
+        Assert.AreEqual(block.Effect, "ExtraLife");
+        MandatoryBlockRequirements(block);
+        HealthCanDecrement(block);
+    }
+
+    [Test]
+    public void TestHardened() {
+        block = new Hardened(new Vec2F(0.0f, 0.0f), "blue-block.png");
+
+        Assert.AreEqual(block.OnHit(), BlockAction.None);
+        Assert.AreEqual(block.OnHit(), BlockAction.Destroy);
+        Assert.AreEqual(block.Effect, "None");
+        MandatoryBlockRequirements(block);
+        HealthCanDecrement(block);
+    }
+
+    [Test]
+    public void TestHungry() {
+        block = new Hungry(new Vec2F(0.0f, 0.0f), "blue-block.png");
+
+        Assert.AreEqual(block.OnHit(), BlockAction.None);
+        Assert.AreEqual(block.OnHit(), BlockAction.Destroy);
+        Assert.AreEqual(block.Effect, "Hungry");
+        MandatoryBlockRequirements(block);
+        HealthCanDecrement(block);
+    }
+
+    [Test]
+    public void TestInvincible() {
+        block = new Invincible(new Vec2F(0.0f, 0.0f), "blue-block.png");
+
+        Assert.AreEqual(block.OnHit(), BlockAction.Destroy);
+        Assert.AreEqual(block.Effect, "Invincible");
+        MandatoryBlockRequirements(block);
+        HealthCanDecrement(block);
+    }
+
+    [Test]
+    public void TestSpeedPowerUp() {
+        block = new SpeedPowerUp(new Vec2F(0.0f, 0.0f), "blue-block.png");
+
+        Assert.AreEqual(block.OnHit(), BlockAction.Destroy);
+        Assert.AreEqual(block.Effect, "SpeedPowerUp");
+        MandatoryBlockRequirements(block);
+        HealthCanDecrement(block);
+    }
+
+    [Test]
+    public void TestUnbreakable() {
+        block = new Unbreakable(new Vec2F(0.0f, 0.0f), "blue-block.png");
+
+        Assert.AreEqual(block.OnHit(), BlockAction.None);
+        Assert.True(!block.IsBreakable());
+        Assert.AreEqual(block.Effect, "None");
+        MandatoryBlockRequirements(block);
+    }
+
+    [Test]
+    public void TestWidePowerUp() {
+        block = new WidePowerUp(new Vec2F(0.0f, 0.0f), "blue-block.png");
+
+        Assert.AreEqual(block.OnHit(), BlockAction.Destroy);
+        Assert.AreEqual(block.Effect, "WidePowerUp");
+        MandatoryBlockRequirements(block);
+        HealthCanDecrement(block);
+    }
 }

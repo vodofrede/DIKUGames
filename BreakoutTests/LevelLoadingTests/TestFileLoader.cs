@@ -19,10 +19,9 @@ public class TestFileLoader {
         Level currentLevel;
         // if any level fails to parse, this test will fail because an exception will be thrown.
         foreach (string level in levels) {
-             currentLevel = LevelLoader.ParseFile(Path.Combine("Assets", "Levels", level));
+            currentLevel = LevelLoader.ParseFile(Path.Combine("Assets", "Levels", level));
             Assert.Greater(currentLevel.TimeLimit, 10);
         }
-
     }
 
     [Test]
@@ -38,7 +37,6 @@ public class TestFileLoader {
     [Test]
     public void TestEmptyFiles() {
         // this test satisfies R.3
-
         Assert.IsNotNull(LevelLoader.TryParseFile(Path.Combine("Assets", "Levels", "level2.txt")));
     }
 }
