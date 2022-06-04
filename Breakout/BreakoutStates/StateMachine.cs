@@ -8,8 +8,8 @@ namespace Breakout.BreakoutStates {
         protected Dictionary<string, IGameStateExt> states;
         public IGameState? ActiveState { get; private set; }
 
-        public StateMachine(EventBus eventBus) {
-            this.eventBus = eventBus;
+        public StateMachine() {
+            eventBus = EventBus.GetInstance();
 
             eventBus.Subscribe(GameEventType.GameStateEvent, this);
             eventBus.Subscribe(GameEventType.InputEvent, this);
@@ -22,7 +22,6 @@ namespace Breakout.BreakoutStates {
         /// </summary>
         public void AddState(IGameStateExt gameState) {
             string name = gameState.GetType().Name;
-            Console.WriteLine("Adding GameState " + name);
 
             if (ActiveState == null && states.Count == 0) {
                 ActiveState = gameState;

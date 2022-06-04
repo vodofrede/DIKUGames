@@ -33,9 +33,8 @@ namespace Breakout.BreakoutStates {
         private TextDisplay textDisplay = new();
         private int startTime = (int)Math.Floor(StaticTimer.GetElapsedSeconds());
 
-        public GameRunning(EventBus eventBus) {
-            this.eventBus = eventBus;
-
+        public GameRunning() {
+            eventBus = EventBus.GetInstance();
             eventBus.Subscribe(GameEventType.TimedEvent, this);
 
             // player setup
@@ -153,7 +152,6 @@ namespace Breakout.BreakoutStates {
                     // or score + 1, since it is possible to destroy multiple blocks at once
                     if (score != 0 && (score % 10 == 0 || score + 1 % 10 == 0)) {
                         ballSpeed += speedIncrease;
-                        Console.WriteLine("Speed increased");
                     }
 
                     // apply effect

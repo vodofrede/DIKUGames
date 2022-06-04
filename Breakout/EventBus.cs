@@ -4,9 +4,14 @@ using DIKUArcade.Timers;
 namespace Breakout {
     public class EventBus {
         protected GameEventBus eventBus;
+        protected static EventBus instance;
+
+        public static EventBus GetInstance() {
+            return instance ?? (instance = new EventBus());
+        }
 
         // safer wrapper around game event bus that doesn't need initialize function
-        public EventBus() {
+        private EventBus() {
             eventBus = new GameEventBus();
             eventBus.InitializeEventBus(new List<GameEventType> {
                 GameEventType.PlayerEvent,

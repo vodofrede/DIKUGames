@@ -10,16 +10,15 @@ namespace Breakout {
         private StateMachine stateMachine;
 
         public Game(WindowArgs windowArgs) : base(windowArgs) {
-            eventBus = new EventBus();
-
             // state machine initialization
-            stateMachine = new StateMachine(eventBus);
-            stateMachine.AddState(new MainMenu(eventBus));
-            stateMachine.AddState(new GameRunning(eventBus));
-            stateMachine.AddState(new GamePaused(eventBus));
-            stateMachine.AddState(new GameOver(eventBus));
+            stateMachine = new StateMachine();
+            stateMachine.AddState(new MainMenu());
+            stateMachine.AddState(new GameRunning());
+            stateMachine.AddState(new GamePaused());
+            stateMachine.AddState(new GameOver());
 
             // event bus
+            eventBus = EventBus.GetInstance();
             eventBus.Subscribe(GameEventType.WindowEvent, this);
             eventBus.Subscribe(GameEventType.GameStateEvent, stateMachine);
 

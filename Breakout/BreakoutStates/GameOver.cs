@@ -23,8 +23,8 @@ namespace Breakout.BreakoutStates {
         private TextDisplay menuButtons = new();
         private GameOverButton activeMenuButton = GameOverButton.MainMenu;
 
-        public GameOver(EventBus eventBus) {
-            this.eventBus = eventBus;
+        public GameOver() {
+            eventBus = EventBus.GetInstance();
 
             // status text
             statusText.AddTextField(new TextField(() => "Game Over!", new Vec2F(0.17f, 0.5f), new Vec2F(0.8f, 0.4f)));
@@ -60,7 +60,6 @@ namespace Breakout.BreakoutStates {
         public void ResetState() { }
 
         public void SetState(object extraState) {
-            Console.WriteLine(extraState);
             dynamic state = extraState;
             score = state.Score;
             won = state.Won;

@@ -17,8 +17,8 @@ namespace Breakout.BreakoutStates {
         private TextDisplay menuButtons = new();
         private GamePausedButton activeMenuButton = GamePausedButton.Continue;
 
-        public GamePaused(EventBus eventBus) {
-            this.eventBus = eventBus;
+        public GamePaused() {
+            eventBus = EventBus.GetInstance();
 
             // buttons
             var continueButton = new TextField(() => "Continue", new Vec2F(0.2f, 0.6f), new Vec2F(0.2f, 0.2f));
