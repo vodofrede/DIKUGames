@@ -3,40 +3,8 @@ using Breakout.Blocks;
 using DIKUArcade.Entities;
 using DIKUArcade.Math;
 
-namespace Breakout {
-    /// <summary>
-    /// Loads levels from text files and parses them into Level instances
-    /// </summary
-    public class LevelLoader {
-        // fields
-        private List<Level> levels;
-        private int levelIndex = 0;
-
-        // constructors
-        public LevelLoader(List<Level> levels) {
-            this.levels = levels;
-            // this.levels = new() { ParseFile(Path.Combine("Assets", "Levels", "level2.txt")) };
-        }
-        public LevelLoader(List<string> levelPaths) : this(levelPaths.Select(levelPath => ParseFile(levelPath)).ToList()) { }
-        public LevelLoader() : this(Directory.GetFiles(Path.Combine("Assets", "Levels")).ToList()) { }
-
-        // methods
-        /// <summary>
-        /// Get the next level in the list of maps
-        /// </summary>
-        public Level? Next() {
-            var level = levelIndex < levels.Count ? levels[levelIndex] : null;
-            levelIndex++; ;
-            return level;
-        }
-
-        /// <summary>
-        /// Reset the level index
-        /// </summary>
-        public void Reset() {
-            levelIndex = 0;
-        }
-
+namespace Breakout.Levels {
+    public class LevelParser {
         private static string mapPattern = @"(Map:\n)((.*\n)*)(Map\/)";
         private static string metaPattern = @"(Meta:\n)((.*\n)*)(Meta\/)";
         private static string legendPattern = @"(Legend:\n)((.*\n)*)(Legend\/)";
@@ -45,17 +13,18 @@ namespace Breakout {
         /// <summary>
         /// Parse a path into a level
         /// </summary>
-        public static Level ParseFile(string filePath) {
-            string file = File.ReadAllText(filePath);
-            string normalized = Regex.Replace(file, @"\r\n|\n\r|\n|\r", "\n");
+        public static Level ParseContents(string levelContents) {
+            if (levelContents == null) {
+                throw new ArgumentException("levelContents cannot be null or empty");
+            }
 
             Regex mapRegex = new Regex(mapPattern);
             Regex metaRegex = new Regex(metaPattern);
             Regex legendRegex = new Regex(legendPattern);
 
-            string mapString = mapRegex.Match(normalized).Groups[2].ToString();
-            string metaString = metaRegex.Match(normalized).Groups[2].ToString();
-            string legendString = legendRegex.Match(normalized).Groups[2].ToString();
+            string mapString = mapRegex.Match(levelContents).Groups[2].ToString();
+            string metaString = metaRegex.Match(levelContents).Groups[2].ToString();
+            string legendString = legendRegex.Match(levelContents).Groups[2].ToString();
 
             // parse meta
             string name = "placeholder";
@@ -114,19 +83,15 @@ namespace Breakout {
         /// <summary>
         /// Catch any errors from parsing a level file
         /// </summary>
-        public static Level? TryParseFile(string file) {
+        public static Level? TryParseContents(string levelContents) {
             Level? level = null;
             try {
-                level = ParseFile(file);
+                level = ParseContents(levelContents);
             } catch (Exception e) {
                 Console.WriteLine("Cannot parse level file, please make sure that the file is correctly formatted or choose another level.");
                 Console.WriteLine("Error: " + e);
-                Environment.Exit(0);
             }
             return level;
         }
     }
 }
-
-
-

@@ -1,7 +1,7 @@
 using Breakout.Blocks;
 using DIKUArcade.Entities;
 
-namespace Breakout {
+namespace Breakout.Levels {
     /// <summary>
     /// Simple level class which contains relevant information for rendering a level
     /// </summary
