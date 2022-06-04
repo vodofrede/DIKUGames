@@ -2,6 +2,9 @@ using DIKUArcade.Graphics;
 using DIKUArcade.Math;
 
 namespace Breakout.Blocks {
+    /// <summary>
+    /// Block which has two hitpoints and gives twice the reward
+    /// </summary
     public class Hardened : Block {
         public Hardened(Vec2F pos, string imageName) : base(pos, imageName) {
             string altImageName = imageName.Insert(imageName.Length - 3, "-damaged");

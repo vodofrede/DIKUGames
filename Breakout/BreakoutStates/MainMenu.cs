@@ -3,15 +3,18 @@ using DIKUArcade.Events;
 using DIKUArcade.Graphics;
 using DIKUArcade.Input;
 using DIKUArcade.Math;
-using DIKUArcade.State;
 
 namespace Breakout.BreakoutStates {
+    /// <summary>
+    /// Game State class for handling the Main Menu state.
+    /// This class should be used as part of a State Machine instance.
+    /// </summary
     public class MainMenu : IGameStateExt {
         private EventBus eventBus;
 
         // visuals
         private Entity backgroundImage = new(
-            new DynamicShape(new Vec2F(0.0f, 0.0f), new Vec2F(1.0f, 1.0f)),
+            new StationaryShape(new Vec2F(0.0f, 0.0f), new Vec2F(1.0f, 1.0f)),
             new Image(Path.Combine("Assets", "Images", "BreakoutTitleScreen.png"))
         );
         private TextDisplay menuButtons = new();

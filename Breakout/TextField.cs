@@ -1,8 +1,10 @@
-using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 using DIKUArcade.Math;
 
 namespace Breakout {
+    /// <summary>
+    /// Wrapper around the Text class which can auto-update the contents of the text.
+    /// </summary
     public class TextField {
         protected Text text;
         protected Func<string> displayed;

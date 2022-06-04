@@ -2,7 +2,11 @@ using DIKUArcade.Events;
 using DIKUArcade.State;
 
 namespace Breakout.BreakoutStates {
-
+    /// <summary>
+    /// State Machine class which acts by switching between active states using messages passed by the event bus.
+    /// The state machine will call the relevant update, render etc. functions on the active game state.
+    /// This class also contains
+    /// </summary
     public class StateMachine : IGameEventProcessor {
         protected EventBus eventBus;
         protected Dictionary<string, IGameStateExt> states;

@@ -3,9 +3,12 @@ using DIKUArcade.Events;
 using DIKUArcade.Graphics;
 using DIKUArcade.Input;
 using DIKUArcade.Math;
-using DIKUArcade.State;
 
 namespace Breakout.BreakoutStates {
+    /// <summary>
+    /// Game State class for handling the Game Paused state
+    /// This class should be used as part of a State Machine instance.
+    /// </summary
     public class GamePaused : IGameStateExt {
         private EventBus eventBus;
 

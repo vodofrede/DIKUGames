@@ -1,6 +1,9 @@
 using DIKUArcade.Math;
 
 namespace Breakout.Blocks {
+    /// <summary>
+    /// Block that cannot be destroyed
+    /// </summary
     public class Unbreakable : Block {
         public Unbreakable(Vec2F pos, string imageName) : base(pos, imageName) { }
 

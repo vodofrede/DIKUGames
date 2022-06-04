@@ -1,10 +1,12 @@
 using DIKUArcade.Entities;
 using DIKUArcade.Events;
 using DIKUArcade.Graphics;
-using DIKUArcade.Input;
 using DIKUArcade.Math;
 
 namespace Breakout {
+    /// <summary>
+    /// Player class
+    /// </summary
     public class Player : Entity, IGameEventProcessor {
         private float moveLeft;
         private float moveRight;

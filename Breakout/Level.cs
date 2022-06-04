@@ -1,8 +1,10 @@
 using Breakout.Blocks;
 using DIKUArcade.Entities;
-using DIKUArcade.Math;
 
 namespace Breakout {
+    /// <summary>
+    /// Simple level class which contains relevant information for rendering a level
+    /// </summary
     public class Level {
         public string Name { get; private set; }
         public int TimeLimit { get; private set; }

@@ -5,6 +5,9 @@ using DIKUArcade.GUI;
 using DIKUArcade.Input;
 
 namespace Breakout {
+    /// <summary>
+    /// Game Class which implements DIKUGame and acts as the main container for the state and the logic of the game.
+    /// </summary
     public class Game : DIKUGame, IGameEventProcessor {
         private EventBus eventBus;
         private StateMachine stateMachine;

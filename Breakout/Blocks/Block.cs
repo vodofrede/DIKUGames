@@ -3,11 +3,9 @@ using DIKUArcade.Graphics;
 using DIKUArcade.Math;
 
 namespace Breakout.Blocks {
-    public enum BlockAction {
-        None,
-        Destroy
-    }
-
+    /// <summary>
+    /// Block superclass which is the structural base for all other blocks
+    /// </summary
     public class Block : Entity {
         protected const float HORIZONTAL_BLOCKS = 12f;
         protected const float VERTICAL_BLOCKS = 25f;
@@ -18,18 +16,14 @@ namespace Breakout.Blocks {
 
         protected IBaseImage? altImage;
 
-        public Block(Vec2F pos, string imageName) : base(new StationaryShape(new Vec2F(pos.X / HORIZONTAL_BLOCKS, 1f - pos.Y / VERTICAL_BLOCKS), new Vec2F(1f / 12f, 1f / 25f)), new Image(Path.Combine("Assets", "Images", imageName))) {
-
-        }
+        public Block(Vec2F pos, string imageName) : base(new StationaryShape(new Vec2F(pos.X / HORIZONTAL_BLOCKS, 1f - pos.Y / VERTICAL_BLOCKS), new Vec2F(1f / 12f, 1f / 25f)), new Image(Path.Combine("Assets", "Images", imageName))) { }
 
         public virtual BlockAction OnHit() {
             Hitpoints = Math.Max(0, Hitpoints - 1);
             return Hitpoints <= 0 ? BlockAction.Destroy : BlockAction.None;
         }
 
-        public virtual void Update() {
-
-        }
+        public virtual void Update() { }
 
         public virtual bool IsBreakable() {
             return true;

@@ -1,10 +1,12 @@
 using System.Text.RegularExpressions;
 using Breakout.Blocks;
 using DIKUArcade.Entities;
-using DIKUArcade.Graphics;
 using DIKUArcade.Math;
 
 namespace Breakout {
+    /// <summary>
+    /// Loads levels from text files and parses them into Level instances
+    /// </summary
     public class LevelLoader {
         // fields
         private List<Level> levels;

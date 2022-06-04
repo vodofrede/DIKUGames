@@ -1,4 +1,7 @@
 namespace Breakout {
+    /// <summary>
+    /// Contains multiple textfields and renders them all.
+    /// </summary
     public class TextDisplay {
         protected List<TextField> textFields = new();
 

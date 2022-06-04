@@ -2,9 +2,12 @@ using DIKUArcade.Events;
 using DIKUArcade.Timers;
 
 namespace Breakout {
+    /// <summary>
+    /// Event Bus singleton class for passing events throughout the game
+    /// </summary
     public class EventBus {
         protected GameEventBus eventBus;
-        protected static EventBus instance;
+        private static EventBus? instance;
 
         public static EventBus GetInstance() {
             return instance ?? (instance = new EventBus());

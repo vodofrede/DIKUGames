@@ -5,10 +5,13 @@ using DIKUArcade.Graphics;
 using DIKUArcade.Input;
 using DIKUArcade.Math;
 using DIKUArcade.Physics;
-using DIKUArcade.State;
 using DIKUArcade.Timers;
 
 namespace Breakout.BreakoutStates {
+    /// <summary>
+    /// Game State class for handling the Game Running state
+    /// This class should be used as part of a State Machine instance.
+    /// </summary
     public class GameRunning : IGameStateExt, IGameEventProcessor {
         // constants
         private const int LIVES = 3;

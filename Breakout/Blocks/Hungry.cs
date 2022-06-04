@@ -1,6 +1,9 @@
 using DIKUArcade.Math;
 
 namespace Breakout.Blocks {
+    /// <summary>
+    /// Block which removes the ball upon impact
+    /// </summary
     public class Hungry : Block {
         public Hungry(Vec2F pos, string imageName) : base(pos, imageName) {
             Hitpoints = 2;

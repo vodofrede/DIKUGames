@@ -3,6 +3,9 @@ using DIKUArcade.Graphics;
 using DIKUArcade.Math;
 
 namespace Breakout {
+    /// <summary>
+    /// The ball in breakout
+    /// </summary
     public class Ball : Entity {
         // associated constants
         private const float DIAMETER = 0.05f;
