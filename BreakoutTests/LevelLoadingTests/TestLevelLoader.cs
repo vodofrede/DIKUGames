@@ -13,7 +13,6 @@ public class TestLevelLoader {
 
     [Test]
     public void TestAllLevelsWorkAsMaps() {
-        // this test satisfies R.1
         string[] levels = new string[] { "central-mass.txt", "columns.txt", "level1.txt", "level2.txt", "level3.txt", "wall.txt" };
         Level currentLevel;
         // if any level fails to parse, this test will fail because an exception will be thrown.
@@ -25,7 +24,6 @@ public class TestLevelLoader {
 
     [Test]
     public void TestEmptyFiles() {
-        // this test satisfies R.3
         Assert.IsNotNull(LevelLoader.TryLoadLevel(Path.Combine("Assets", "Levels", "level2.txt")));
     }
 }
