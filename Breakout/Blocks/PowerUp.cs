@@ -2,7 +2,7 @@ using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 using DIKUArcade.Math;
 
-namespace Breakout {
+namespace Breakout.Blocks {
     /// <summary>
     /// PowerUp class that can be instantiated with different data.
     /// </summary
