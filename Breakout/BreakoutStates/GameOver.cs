@@ -103,12 +103,12 @@ namespace Breakout.BreakoutStates {
         }
     }
 
-    enum GameOverButton {
+    public enum GameOverButton {
         MainMenu,
         Exit
     }
 
-    static class GameOverButtonExt {
+    public static class GameOverButtonExt {
         public static GameOverButton Prev(this GameOverButton button) {
             var index = (int)button;
             return (GameOverButton)Math.Max(0, index - 1);

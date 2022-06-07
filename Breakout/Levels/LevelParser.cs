@@ -11,7 +11,7 @@ namespace Breakout.Levels {
 
         // static methods
         /// <summary>
-        /// Parse a path into a level
+        /// Parse a string into a level
         /// </summary>
         public static Level ParseContents(string levelContents) {
             if (levelContents == null) {

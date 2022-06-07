@@ -89,12 +89,12 @@ namespace Breakout.BreakoutStates {
 
     }
 
-    enum MainMenuButton {
+    public enum MainMenuButton {
         Play,
         Exit
     }
 
-    static class MainMenuButtonExt {
+    public static class MainMenuButtonExt {
         public static MainMenuButton Prev(this MainMenuButton button) {
             var index = (int)button;
             return (MainMenuButton)Math.Max(0, index - 1);

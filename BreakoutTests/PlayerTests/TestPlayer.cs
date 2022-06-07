@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Breakout;
 using DIKUArcade.Entities;
+using DIKUArcade.Events;
 using DIKUArcade.Graphics;
 using DIKUArcade.GUI;
 using NUnit.Framework;
@@ -86,5 +87,34 @@ public class TestPlayer {
     public void TestPlayerInBottomHalfOfScreen() {
         // test satisfies R.7
         Assert.GreaterOrEqual(0.5f, player.Shape.Position.Y);
+    }
+
+    [Test]
+    public void TestGetPosition() {
+        Assert.IsNotNull(player.GetPosition());
+    }
+
+    [Test]
+    public void TestMoveEvent() {
+        player.ProcessEvent(new GameEvent {
+            EventType = GameEventType.PlayerEvent,
+            From = this,
+            Message = "START_MOVE_RIGHT"
+        });
+        player.ProcessEvent(new GameEvent {
+            EventType = GameEventType.PlayerEvent,
+            From = this,
+            Message = "START_MOVE_LEFT"
+        });
+        player.ProcessEvent(new GameEvent {
+            EventType = GameEventType.PlayerEvent,
+            From = this,
+            Message = "STOP_MOVE_RIGHT"
+        });
+        player.ProcessEvent(new GameEvent {
+            EventType = GameEventType.PlayerEvent,
+            From = this,
+            Message = "STOP_MOVE_LEFT"
+        });
     }
 }

@@ -102,13 +102,13 @@ namespace Breakout.BreakoutStates {
         }
     }
 
-    enum GamePausedButton {
+    public enum GamePausedButton {
         Continue,
         MainMenu,
         Exit,
     }
 
-    static class MenuButtonExt {
+    public static class GamePausedButtonExt {
         public static GamePausedButton Prev(this GamePausedButton button) {
             var index = (int)button;
             return (GamePausedButton)Math.Max(0, index - 1);

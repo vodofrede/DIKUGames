@@ -13,8 +13,8 @@ namespace BreakoutTests {
 
         [Test]
         public void TestLevelHasCorrectFields() {
-            var level = new Level("lol", 301, new EntityContainer<Block>() { });
-            Assert.AreEqual(level.Name, "lol");
+            var level = new Level("Hardcore", 301, new EntityContainer<Block>() { });
+            Assert.AreEqual(level.Name, "Hardcore");
             Assert.AreEqual(level.TimeLimit, 301);
             Assert.True(level.Blocks.CountEntities() == 0);
         }
